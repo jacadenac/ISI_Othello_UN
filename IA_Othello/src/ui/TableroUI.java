@@ -296,6 +296,7 @@ public final class TableroUI extends JFrame {
 	public void declararEmpate(){
 		this.mostrarTurno.setFont(mostrarTurno.getFont().deriveFont(Font.BOLD));
 		this.mostrarTurno.setText("Empate !?");
+		JOptionPane.showMessageDialog(this, "¡¡Empate!! ", "¡Buena Partida!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public void declararGanador(String nombreGanador){
