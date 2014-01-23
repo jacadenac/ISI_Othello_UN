@@ -10,12 +10,22 @@ import logica.ExploradorMovimientos;
 
 public class Tablero {
 	
-	public static final int TABLERO_LARGO = 10;//14;
-	public static final int TABLERO_ANCHO = 10;//14;
+	//public static final int TABLERO_LARGO = 10;//14;
+	//public static final int TABLERO_ANCHO = 10;//14;
+	
+	public static int TABLERO_LARGO = 10;
+	public static int TABLERO_ANCHO = 10;
+	
 	private Map<Point, EstadoCasilla> tablero;
 	
 	public Tablero() {
-		super();
+		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
+		inicializar();
+	}
+	
+	public Tablero(int largo, int ancho) {
+		TABLERO_LARGO = largo;
+		TABLERO_ANCHO = ancho;
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
 		inicializar();
 	}
@@ -44,6 +54,16 @@ public class Tablero {
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2)-1, (int)(Tablero.TABLERO_LARGO/2)), EstadoCasilla.BLACK);
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2), (int)(Tablero.TABLERO_LARGO/2)-1), EstadoCasilla.BLACK);
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2), (int)(Tablero.TABLERO_LARGO/2)), EstadoCasilla.WHITE);
+		
+		/*------*///System.out.println("Tablero inicializar() tablero.put(new Point(2,3), EstadoCasilla.WALL);");
+		//tablero.put(new Point(2,3), EstadoCasilla.WALL);
+	}
+	
+	
+	public final void reDefinirDimensiones(int largo, int ancho){
+		TABLERO_LARGO = largo;
+		TABLERO_ANCHO = ancho;
+		inicializar();
 	}
 	
 	public EstadoCasilla obtenerEstadoCasilla(Point point){
@@ -155,6 +175,5 @@ public class Tablero {
 		sb.append('\n');
 		return sb.toString();
 	}
-	
 
 }

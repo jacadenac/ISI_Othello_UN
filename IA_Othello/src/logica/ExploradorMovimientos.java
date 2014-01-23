@@ -21,8 +21,10 @@ public class ExploradorMovimientos {
 	* @return si la búsqueda en esta dirección es propensa a tener resultados interesantes
 	*/
 	private static boolean  deberiaBuscar(final Tablero tablero, final Point semilla, final Direccion direccion){
-		Point nextPoint = direccion.siguiente(semilla);
-		return puntoEsValido(nextPoint, tablero) ? tablero.obtenerEstadoCasilla(nextPoint) == tablero.obtenerEstadoCasilla(semilla).opposite() : false;
+
+			Point nextPoint = direccion.siguiente(semilla);
+			return puntoEsValido(nextPoint, tablero) ? tablero.obtenerEstadoCasilla(nextPoint) == tablero.obtenerEstadoCasilla(semilla).opposite() : false;
+
 	}
 	
 	/**

@@ -15,13 +15,11 @@ package core;
 public enum EstadoCasilla {
 	BLACK('B'),
 	WHITE('W'),
-//	BLACK('x'),
-//	WHITE('o'),
 	PSSBL('.'),
 	EMPTY(' '),
 	WALL('W');
 	private final char symbol;
-
+	
 	EstadoCasilla(char symbol) {
 		this.symbol = symbol;
 	}
@@ -38,4 +36,5 @@ public enum EstadoCasilla {
 	public String toString() {
 		return String.valueOf(symbol);
 	}
+	
 }

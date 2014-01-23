@@ -10,6 +10,7 @@ import java.util.Set;
 
 import core.EstadoCasilla;
 import core.Jugador;
+import core.Tablero;
 
 import logica.Controlador;
 
@@ -17,7 +18,6 @@ import ui.ComponenteImagen;
 import ui.FabricaImagenCasilla.TipoCasilla;
 import ui.TableroUI;
 import utilidades.Transform;
-//import logic.Controller;
 
 public class UIJuego implements Runnable{
 
@@ -43,14 +43,58 @@ public class UIJuego implements Runnable{
 				run();
 			}
 		});
-		
-		//se omite dificultad
-
+		tableroUI.obtenerTableroClasico().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Tablero.TABLERO_ANCHO = 10;
+				Tablero.TABLERO_LARGO = 10;
+				tableroUI.dispose();
+				tableroUI = new TableroUI(Tablero.TABLERO_LARGO,Tablero.TABLERO_ANCHO);
+				//tableroUI.dibujarTablero(CLASICO);
+				controlador.inicializar();
+				iniciarTableroUI();
+				run();
+			}
+		});
+		tableroUI.obtenerTableroOctogonal().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Tablero.TABLERO_ANCHO = 12;
+				Tablero.TABLERO_LARGO = 12;
+				tableroUI.dispose();
+				//tableroUI.dibujarTablero(OCTOGONAL);
+				tableroUI = new TableroUI(Tablero.TABLERO_LARGO,Tablero.TABLERO_ANCHO);
+				controlador.inicializar();
+				iniciarTableroUI();
+				run();
+			}
+		});
+		tableroUI.obtenerTableroPersonalizado().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Tablero.TABLERO_ANCHO = 14;
+				Tablero.TABLERO_LARGO = 14;
+				tableroUI.dispose();
+				//tableroUI.dibujarTablero(PERSONALIZADO);
+				/*
+				 * dibujarTablero(PERSONALIZADO){
+				 *    while(botton.event = noActivado){
+				 * 		esperarEventoClick
+				 * 			dibujarMuroDondeSeHizoClick
+				 *    }
+				 * }
+				 * */
+				tableroUI = new TableroUI(Tablero.TABLERO_LARGO,Tablero.TABLERO_ANCHO);
+				controlador.inicializar();
+				iniciarTableroUI();
+				run();
+			}
+		});
 	}
-
+	
 	@Override
 	public void run() {
-		if (controlador.finDelJuego()) {
+		if (controlador.finDelJuego()) {	
 			juegoTerminado();
 		} else {
 			movidasPosibles = marcarMovidasPosibles();
@@ -58,15 +102,25 @@ public class UIJuego implements Runnable{
 				pasar();
 				run();
 			}
+			
 			if (controlador.jugadorActual() != tableroUI.obtenerJugadorSeleccionado()
-					&& tableroUI.obtenerOponentes() == tableroUI.HUM_ROB) {
+					&& tableroUI.obtenerOponentes() == tableroUI.HUM_ROB
+					&& !controlador.finDelJuego()) {		
 				tableroUI.desmarcarMovidasPosibles(movidasPosibles);
-				//Point movidaComputador = controlador.evaluarMovida();
-				//hacerMovida(movidaComputador);
-				//despuesDeMovida();
+				Point movidaComputador = controlador.evaluarMovida();
+				hacerMovida(movidaComputador);
+				despuesDeMovida();
+			}
+			
+			if (tableroUI.obtenerOponentes() == tableroUI.ROB_ROB && !controlador.finDelJuego()) {		
+				tableroUI.desmarcarMovidasPosibles(movidasPosibles);
+				Point movidaComputador = controlador.evaluarMovida();
+				hacerMovida(movidaComputador);
+				//System.out.println("entró a jugar PC"+controlador.jugadorActual().toString());
+				despuesDeMovida();
 			}
 		}
-		
+									
 	}
 
 	
@@ -78,7 +132,7 @@ public class UIJuego implements Runnable{
 					? TipoCasilla.PSSBLWHT : TipoCasilla.PSSBLBLK;
 			tableroUI.marcarMovidasPosibles(movidas, color);
 		}
-		ActualizarListeners();
+		ActualizarListeners();	
 		return movidas;
 	}
 
@@ -115,8 +169,6 @@ public class UIJuego implements Runnable{
 				? TipoCasilla.WHITE : TipoCasilla.BLACK;
 		Set<Point> casillasPorCambiar = controlador.hacerMovimiento(movida);
 		tableroUI.rellenar(casillasPorCambiar, color);
-		
-		
 	}
 	
 	private void despuesDeMovida() {
@@ -131,7 +183,9 @@ public class UIJuego implements Runnable{
 	}
 
 	private void turnoPerdido() {
-		tableroUI.notificarTurnoPerdido(controlador.jugadorActual());
+		if(tableroUI.obtenerOponentes() != tableroUI.ROB_ROB){
+			tableroUI.notificarTurnoPerdido(controlador.jugadorActual());
+		}
 		cambiarTurno();
 	}
 
@@ -155,5 +209,4 @@ public class UIJuego implements Runnable{
 		}
 	}
 	
-
 }
