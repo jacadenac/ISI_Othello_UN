@@ -18,24 +18,35 @@ public class Tablero {
 	
 	private Map<Point, EstadoCasilla> tablero;
 	
+	public enum TipoTablero {
+		CLASICO,
+		OCTOGONAL,
+		PERSONALIZADO;
+	}
+	private TipoTablero tipoTablero;
+	
 	public Tablero() {
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
+		this.tipoTablero = TipoTablero.CLASICO;
 		inicializar();
 	}
 	
-	public Tablero(int largo, int ancho) {
+	public Tablero(int largo, int ancho, TipoTablero tipoTablero) {
 		TABLERO_LARGO = largo;
 		TABLERO_ANCHO = ancho;
+		this.tipoTablero = tipoTablero;
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
 		inicializar();
 	}
 	
 	public Tablero(Map<Point, EstadoCasilla> tablero) {
 		super();
+		this.tipoTablero = TipoTablero.PERSONALIZADO;
 		this.tablero = new HashMap<Point, EstadoCasilla>(tablero.size());
 		for(Point point : tablero.keySet()) {
 			this.tablero.put(new Point(point), tablero.get(point));
 		}
+		
 	}
 
 	public void inicializar() {
@@ -54,16 +65,16 @@ public class Tablero {
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2)-1, (int)(Tablero.TABLERO_LARGO/2)), EstadoCasilla.BLACK);
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2), (int)(Tablero.TABLERO_LARGO/2)-1), EstadoCasilla.BLACK);
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2), (int)(Tablero.TABLERO_LARGO/2)), EstadoCasilla.WHITE);
-		
-		/*------*///System.out.println("Tablero inicializar() tablero.put(new Point(2,3), EstadoCasilla.WALL);");
-		//tablero.put(new Point(2,3), EstadoCasilla.WALL);
 	}
 	
+	/*
+	public void inicializar(Map<Point, EstadoCasilla> tablero) {
+
+		}
+	}*/
 	
-	public final void reDefinirDimensiones(int largo, int ancho){
-		TABLERO_LARGO = largo;
-		TABLERO_ANCHO = ancho;
-		inicializar();
+	public Map<Point, EstadoCasilla> obtenerTablero(){
+		return tablero;
 	}
 	
 	public EstadoCasilla obtenerEstadoCasilla(Point point){
@@ -107,6 +118,14 @@ public class Tablero {
 		for (Point point : movidasPosibles) {
 			tablero.put(point, EstadoCasilla.PSSBL);
 		}
+	}
+	
+	/*public void crearTableroPersonalizado(Set<Point> points, EstadoCasilla estado) {
+		
+	}
+	*/
+	public void actualizarEstadoCasilla(Point punto, EstadoCasilla estadoCasilla) {
+		tablero.put(punto, estadoCasilla);
 	}
 	
 	public void desmarcarMovidasPosibles() {

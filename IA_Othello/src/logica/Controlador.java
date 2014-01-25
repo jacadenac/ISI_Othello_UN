@@ -1,6 +1,7 @@
 package logica;
 
 import java.awt.Point;
+import java.util.Map;
 import java.util.Set;
 
 import logica.ia.buscadores.BuscadorAbstracto;
@@ -11,6 +12,7 @@ import logica.ia.buscadores.NegaMax;
 import core.EstadoCasilla;
 import core.Jugador;
 import core.Tablero;
+import core.Tablero.TipoTablero;
 
 public final class Controlador {
 	
@@ -21,6 +23,7 @@ public final class Controlador {
 	/* 0: todos bien , 1: uno no puede mover , 2: ninguno puede mover */
 	private final short PUEDEMOVER = 0, NOPUEDEMOVER = 2;
 	private short puedeMover = PUEDEMOVER;
+	public boolean estaJuegoTerminado;
 	
 	public Controlador() {
 		super();
@@ -38,28 +41,30 @@ public final class Controlador {
 		tablero.desmarcarMovidasPosibles();
 	}
 	
+	public void actualizarEstadoCasilla(Point punto, EstadoCasilla estadoCasilla) {
+		tablero.actualizarEstadoCasilla(punto, estadoCasilla);
+	}
+	
 	public Set<Point> hacerMovimiento(Point movida) {
 		return tablero.hacerMovimiento(movida, jugador.color());
 	}
-	/*
-	private int calcularPuntaje(EstadoCasilla estado) {
-		return tablero.contar(estado);
-	}
-	*/
+
 	public int obtenerPuntajeNegro() {
-		return tablero.contar(EstadoCasilla.BLACK);
+		jugador.setPuntajeNegro(tablero.contar(EstadoCasilla.BLACK));
+		return jugador.getPuntajeNegro();
 	}
 	
 	public int obtenerPuntajeBlanco() {
-		return tablero.contar(EstadoCasilla.WHITE);
+		jugador.setPuntajeBlanco(tablero.contar(EstadoCasilla.WHITE));
+		return jugador.getPuntajeBlanco();
 	}
 	
 	public Jugador obtenerGanador() {
-		return obtenerPuntajeNegro() < obtenerPuntajeBlanco() ? Jugador.WHITE : Jugador.BLACK;
+		return jugador.getPuntajeNegro() < jugador.getPuntajeBlanco() ? Jugador.WHITE : Jugador.BLACK;
 	}
 	
 	public boolean esEmpate() {
-		return obtenerPuntajeNegro() == obtenerPuntajeBlanco();
+		return jugador.getPuntajeNegro() == jugador.getPuntajeBlanco();
 	}
 	
 	/**
@@ -98,13 +103,28 @@ public final class Controlador {
 		tablero.inicializar();
 		jugador = Jugador.BLACK;
 		puedeMover = PUEDEMOVER;
+		
+		estaJuegoTerminado=false;
 	}
 	
-	public void inicializar(int largoTablero, int anchoTablero) {
-		this.tablero = 	new Tablero(largoTablero,anchoTablero);
+	public void inicializar(int largoTablero, int anchoTablero, TipoTablero tipoTablero) {
+		this.tablero = 	new Tablero(largoTablero, anchoTablero, tipoTablero);
 		tablero.inicializar();
 		jugador = Jugador.BLACK;
 		puedeMover = PUEDEMOVER;
+	}
+	
+	public void inicializar(Map<Point, EstadoCasilla> tablero, EstadoCasilla colorJugador) {
+		this.tablero = 	new Tablero(tablero);
+		jugador = Jugador.BLACK;
+		if (colorJugador == EstadoCasilla.WHITE) {
+			jugador = Jugador.WHITE;
+		} 		
+		puedeMover = PUEDEMOVER;
+	}
+	
+	public Tablero obtenerTableroLogica(){
+		return tablero;
 	}
 		
 	/* este método es el que se utilizará 

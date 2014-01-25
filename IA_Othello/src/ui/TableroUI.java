@@ -3,6 +3,7 @@ package ui;
 import core.EstadoCasilla;
 import core.Jugador;
 import core.Tablero;
+import core.Tablero.TipoTablero;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -20,10 +21,12 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -36,7 +39,6 @@ import javax.swing.SwingUtilities;
 
 import ui.FabricaImagenCasilla.TipoCasilla;
 import utilidades.Transform;
-import othello.Juego;
 import othello.Othello;
 import othello.UIJuego;
 
@@ -61,15 +63,28 @@ public final class TableroUI extends JFrame {
 	private JLabel mostrarTurno;
 	private JRadioButtonMenuItem[] diffbuttons;
 	private JMenuItem juegoNuevo;
+	private JMenuItem guardarJuego;
+	private JMenuItem abrirJuego;
 	private JRadioButtonMenuItem tableroClasico;
 	private JRadioButtonMenuItem tableroOctogonal;
 	private JRadioButtonMenuItem tableroPersonalizado;
+	private JRadioButtonMenuItem tablero10x10;
+	private JRadioButtonMenuItem tablero12x12;
+	private JRadioButtonMenuItem tablero14x14;
+	private Tablero tableroLogica;
+	private JPanel barraEstado;
+	private JPanel barraBoton;
+	private Container pane = this.getContentPane();
+	public JButton boton;
+	TipoTablero tipoTablero;
 
 	
 	
 	public TableroUI() throws HeadlessException {
-		casillas = new ArrayList<ComponenteImagen>(largoTablero * anchoTablero);
-		iniciarComponentes(this.getContentPane());
+		casillas = new ArrayList<ComponenteImagen>(largoTablero*anchoTablero);
+		//iniciarComponentes(this.getContentPane());
+		tipoTablero=TipoTablero.CLASICO;
+		iniciarComponentes();
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -78,11 +93,13 @@ public final class TableroUI extends JFrame {
 		this.setResizable(false);
 	}
 	
-	public TableroUI(int a, int b) throws HeadlessException {
-		largoTablero = a;
-		anchoTablero = b;
-		casillas = new ArrayList<ComponenteImagen>(largoTablero * anchoTablero);
-		iniciarComponentes(this.getContentPane());
+	public TableroUI(int largo, int ancho, Tablero tableroLogica, TipoTablero tipoTablero) throws HeadlessException {
+		largoTablero = largo;
+		anchoTablero = ancho;
+		this.tableroLogica = tableroLogica;
+		this.tipoTablero=tipoTablero;
+		casillas = new ArrayList<ComponenteImagen>(tableroLogica.obtenerTablero().size());
+		iniciarComponentes();
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -92,7 +109,7 @@ public final class TableroUI extends JFrame {
 	}
 	
 	
-	private void iniciarComponentes(final Container pane){
+	private void iniciarComponentes(){
 		pane.setLayout(new GridBagLayout());
 		GridBagConstraints constrains = new GridBagConstraints();
 		ButtonGroup buttongroup = new ButtonGroup();
@@ -110,9 +127,18 @@ public final class TableroUI extends JFrame {
 		barraMenu.add(menu);
 		JMenuItem exit, about;
 		
-		/* ------ Juego Nuevo -----*/
+		/* -------- Juego Nuevo -------*/
 		juegoNuevo = new JMenuItem("Juego Nuevo");
 		menu.add(juegoNuevo);
+		
+		/* -------- Abrir Juego --------*/
+		abrirJuego = new JMenuItem("Abrir");
+		menu.add(abrirJuego);
+		
+		/* -------- Guardar Juego ------*/
+		guardarJuego = new JMenuItem("Guardar");
+		menu.add(guardarJuego);
+		
 		
 		/* ------ Salir del juego -----*/
 		exit = new JMenuItem("Salir");
@@ -193,17 +219,52 @@ public final class TableroUI extends JFrame {
 		buttongroup = new ButtonGroup();
 		
 		tableroClasico = new JRadioButtonMenuItem("CLASICO");
-		tableroClasico.setSelected(true);
+		if (tipoTablero == TipoTablero.CLASICO) {
+			tableroClasico.setSelected(true);
+		}
 		buttongroup.add(tableroClasico);
 		submenu.add(tableroClasico);
 		
 		tableroOctogonal = new JRadioButtonMenuItem("OCTOGONAL");
+		if (tipoTablero == TipoTablero.OCTOGONAL) {
+			tableroOctogonal.setSelected(true);
+		}
 		buttongroup.add(tableroOctogonal);
 		submenu.add(tableroOctogonal);
 		
 		tableroPersonalizado = new JRadioButtonMenuItem("PERSONALIZADO");
+		if (tipoTablero == TipoTablero.PERSONALIZADO) {
+			tableroPersonalizado.setSelected(true);
+		}
 		buttongroup.add(tableroPersonalizado);
 		submenu.add(tableroPersonalizado);
+		
+		menu.add(submenu);
+		
+		/* ------ Dimensiones -----*/
+		submenu = new JMenu("Dimensiones");
+		buttongroup = new ButtonGroup();
+		
+		tablero10x10 = new JRadioButtonMenuItem("10 x 10");
+		if (largoTablero == 10 && anchoTablero == 10) {
+			tablero10x10.setSelected(true);
+		}
+		buttongroup.add(tablero10x10);
+		submenu.add(tablero10x10);
+		
+		tablero12x12 = new JRadioButtonMenuItem("12 x 12");
+		if (largoTablero == 12 && anchoTablero == 12) {
+			tablero12x12.setSelected(true);
+		}
+		buttongroup.add(tablero12x12);
+		submenu.add(tablero12x12);
+		
+		tablero14x14 = new JRadioButtonMenuItem("14 x 14");
+		if (largoTablero == 14 && anchoTablero == 14) {
+			tablero14x14.setSelected(true);
+		}
+		buttongroup.add(tablero14x14);
+		submenu.add(tablero14x14);
 		
 		menu.add(submenu);
 		
@@ -233,14 +294,15 @@ public final class TableroUI extends JFrame {
 		constrains.gridwidth = 0;
 		
 		/* Pintar las casillas */
+		/*
 		tablero = new JPanel (new GridLayout(largoTablero, anchoTablero));
 		for ( int fila = 0; fila < largoTablero; fila++){
 			for (int columna = 0; columna < anchoTablero; columna++){
-				/*if (fila == 2 && columna == 3){
-					ComponenteImagen casillaMuro = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
-					tablero.add(casillaMuro);
-					continue;
-				}*/
+				//if (fila == 2 && columna == 3){
+				//	ComponenteImagen casillaMuro = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
+				//	tablero.add(casillaMuro);
+				//	continue;
+				//}
 				if(fila == 0 ||columna ==0 || fila == largoTablero-1 || columna == anchoTablero-1){
 					ComponenteImagen casillaMuro = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
 					tablero.add(casillaMuro);
@@ -262,6 +324,35 @@ public final class TableroUI extends JFrame {
 		definirCasilla(new Point((int)(largoTablero/2), (int)(anchoTablero/2)), TipoCasilla.WHITE);
 		
 		//tablero = new InterfazTablero();
+		
+		 */
+		
+		tablero = new JPanel (new GridLayout(largoTablero, anchoTablero));
+		ComponenteImagen casillaImagen;
+		
+		for ( int fila = 0; fila < largoTablero; fila++){
+			for (int columna = 0; columna < anchoTablero; columna++){
+				switch(tableroLogica.obtenerTablero().get(new Point(fila, columna))){
+				case EMPTY:
+					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
+					break;
+				case BLACK:
+					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.BLACK);
+					break;
+				case WHITE:
+					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.WHITE);
+					break;
+				case WALL:
+					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
+					break;
+				default:
+					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
+					break;
+				}
+				tablero.add(casillaImagen);
+				casillas.add(casillaImagen);
+			}
+		}	
 		
 		constrains.anchor = GridBagConstraints.CENTER;
 		constrains.fill = GridBagConstraints.NONE;
@@ -288,7 +379,7 @@ public final class TableroUI extends JFrame {
 		estadisticasNegro.setFont(estadisticasBlanco.getFont().deriveFont(Font.PLAIN));
 		estadisticasNegro.setHorizontalAlignment(JLabel.RIGHT);
 		
-		JPanel barraEstado = new JPanel(new GridLayout());
+		barraEstado = new JPanel(new GridLayout());
 		barraEstado.add(estadisticasBlanco);
 		barraEstado.add(mostrarTurno);
 		barraEstado.add(estadisticasNegro);
@@ -298,28 +389,73 @@ public final class TableroUI extends JFrame {
 		constrains.gridx = 1;
 		constrains.gridy = 4;
 		pane.add(barraEstado, constrains);
+
+		boton = new JButton("Salir de Edición");
+		boton.setBorder(BorderFactory.createEtchedBorder());
+		boton.setSize(20, 50);
+		//boton.setBackground(new Color(0, 60, 0));
+		barraBoton = new JPanel(new GridLayout());
+		barraBoton.add(boton);
+		constrains = new GridBagConstraints();
+		constrains.fill = GridBagConstraints.NONE;
+		constrains.weightx = 300;
+		constrains.weighty = 100;
+		constrains.gridx = 1;
+		constrains.gridy = 20;
+		pane.add(barraBoton, constrains);
+		mostrarBarraEstado();
 		
 	}
 	
+	/*public void crearBotonSalidaEdicion(){
+		GridBagConstraints constrains = new GridBagConstraints();
+		boton = new JButton("Salir de Edición");
+		boton.setBorder(BorderFactory.createEtchedBorder());
+		boton.setSize(20, 50);
+		//boton.setBackground(new Color(0, 60, 0));
+		barraBoton = new JPanel(new GridLayout());
+		barraBoton.add(boton);
+		constrains.weightx = 300;
+		constrains.weighty = 100;
+		constrains.gridx = 1;
+		constrains.gridy = 20;
+		pane.add(barraBoton, constrains);
+		mostrarBarraBoton();
+	}*/
 	
-	private void definirCasilla(Point point, TipoCasilla tipoCasilla) {
+	public void mostrarBarraEstado(){
+		barraBoton.setVisible(false);
+		barraEstado.setVisible(true);
+	}
+	
+	public void mostrarBarraBoton(){
+		barraEstado.setVisible(false);
+		barraBoton.setVisible(true);
+	}
+	
+
+	
+	public void definirCasilla(Point point, TipoCasilla tipoCasilla) {
 		ComponenteImagen imgcomp = FabricaImagenCasilla.construirCasilla(tipoCasilla);
 		int index = Transform.pointToIndex(point);
 		casillas.set(index, imgcomp);
 		tablero.remove(index);
 		tablero.add(imgcomp, index);
+		tablero.updateUI();
 	}
 	
 	public void marcarMovidasPosibles(Collection<Point> movidasPosibles, TipoCasilla color){
 		for (Point pssblPoint : movidasPosibles) {
 			definirCasilla(pssblPoint, color);
+			tablero.updateUI();
 		}
 		tablero.revalidate();
 	}
 	
 	public void desmarcarMovidasPosibles(Collection<Point> movidasPosibles){
 		for (Point pssblPoint : movidasPosibles) {
-			definirCasilla(pssblPoint, TipoCasilla.EMPTY);
+			definirCasilla(pssblPoint, TipoCasilla.EMPTY);	
+			tablero.updateUI();
 		}
 		tablero.revalidate();
 	}
@@ -327,11 +463,11 @@ public final class TableroUI extends JFrame {
 	public void rellenar(Collection<Point> puntosConRelleno, TipoCasilla color){
 		for (Point aRellenar : puntosConRelleno) {
 			definirCasilla(aRellenar, color);
+			tablero.updateUI();
 		}
 		tablero.revalidate();
 	}
-	
-	
+		
 	public void actualizarPuntaje(int estadisticasNegro, int estadisticasBlanco) {
 		this.estadisticasNegro.setText("Negras: " + estadisticasNegro);
 		this.estadisticasBlanco.setText("Blancas: " + estadisticasBlanco);
@@ -372,6 +508,14 @@ public final class TableroUI extends JFrame {
 		return juegoNuevo;
 	}
 	
+	public JMenuItem obtenerItemGuardarJuego(){
+		return guardarJuego;
+	}
+	
+	public JMenuItem obtenerItemAbrirJuego(){
+		return abrirJuego;
+	}
+	
 	public JRadioButtonMenuItem obtenerTableroClasico(){
 		return tableroClasico;
 	}
@@ -383,6 +527,25 @@ public final class TableroUI extends JFrame {
 		return tableroPersonalizado;
 	}
 	
+	public JRadioButtonMenuItem obtenerTablero10x10(){
+		return tablero10x10;
+	}
+	
+	public JRadioButtonMenuItem obtenerTablero12x12(){
+		return tablero12x12;
+	}
+	
+	public JRadioButtonMenuItem obtenerTablero14x14(){
+		return tablero14x14;
+	}
+
+	
+	
+	
+	public JButton obtenerBoton(){
+		return boton;
+	}
+	
 	public Jugador obtenerJugadorSeleccionado(){
 		return humano;
 	}
@@ -391,13 +554,7 @@ public final class TableroUI extends JFrame {
 		return oponentes;
 	}
 	
-	public void actualizarPantalla(){ 
 
-		//Juego tab = new Juego();
-		//tab.jugar(14, 14);
-	} 
-	
-	
 	
 	/*MODIFICADOS!!*/
 	/*private void definirCasilla(Point point, TipoCasilla tipoCasilla) {

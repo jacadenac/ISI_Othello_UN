@@ -15,9 +15,9 @@ package core;
 public enum EstadoCasilla {
 	BLACK('B'),
 	WHITE('W'),
-	PSSBL('.'),
-	EMPTY(' '),
-	WALL('W');
+	PSSBL('P'),
+	EMPTY('E'),
+	WALL('M');
 	private final char symbol;
 	
 	EstadoCasilla(char symbol) {
@@ -35,6 +35,28 @@ public enum EstadoCasilla {
 	@Override
 	public String toString() {
 		return String.valueOf(symbol);
+	}
+	
+	public static EstadoCasilla obtenerEstado(String estado){
+		EstadoCasilla estadoCasilla;
+		switch(estado){
+			case "B":
+				estadoCasilla = BLACK;
+				break;
+			case "W":
+				estadoCasilla =  WHITE;
+				break;
+			case "P":
+				estadoCasilla =  PSSBL;
+				break;
+			case "M":
+				estadoCasilla =  WALL;
+				break;
+			default:
+				estadoCasilla =  EMPTY;
+				break;
+		}
+		return estadoCasilla;
 	}
 	
 }
