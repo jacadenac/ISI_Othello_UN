@@ -1,38 +1,44 @@
 package core;
 
-public enum Jugador {
-	BLACK(EstadoCasilla.BLACK),
-	WHITE(EstadoCasilla.WHITE);
+public class Jugador {
 	private EstadoCasilla color;
-	private int puntajeNegro;
-	private int puntajeBlanco;
+	private int puntaje; 
+	private int[] estrategia;
 	
-	private Jugador(EstadoCasilla color) {
+	public Jugador(EstadoCasilla color) {
+		super();
 		this.color = color;
+		this.puntaje = 0;
+		this.estrategia = null; //cargar estrategia desde un archivo
 	}
-
-	public Jugador oponente() {
-		return this == BLACK ? WHITE : BLACK;
+	
+	public Jugador(EstadoCasilla color, int puntaje, int[] estrategia) {
+		super();
+		this.color = color;
+		this.puntaje = puntaje;
+		this.estrategia = estrategia;
 	}
 
 	public EstadoCasilla color() {
 		return color;
 	}
-	
-	public void setPuntajeNegro(int puntaje) {
-		this.puntajeNegro = puntaje;
+
+	public int getPuntaje() {
+		return puntaje;
+	}
+
+	public void setPuntaje(int puntaje) {
+		this.puntaje = puntaje;
+	}
+
+	public int[] getEstrategia() {
+		return estrategia;
+	}
+
+	public void setEstrategia(int[] estrategia) {
+		this.estrategia = estrategia;
 	}
 	
-	public void setPuntajeBlanco(int puntaje) {
-		this.puntajeBlanco = puntaje;
-	}
 	
-	public int getPuntajeNegro() {
-		return this.puntajeNegro;
-	}
-	
-	public int getPuntajeBlanco() {
-		return this.puntajeBlanco;
-	}
 	
 }

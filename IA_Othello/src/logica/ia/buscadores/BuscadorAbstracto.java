@@ -4,10 +4,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import logica.ia.evaluacion.Evaluacion;
 import core.EstadoCasilla;
 import core.Jugador;
 import core.Tablero;
-import logica.ia.evaluacion.Evaluacion;
+import core.Tablero.TipoTablero;
 
 /**
  * La clase buscadorAbstracto, proporciona una opción de "Búsqueda" al azar.
@@ -16,14 +17,15 @@ import logica.ia.evaluacion.Evaluacion;
  * @author Alejandro
  */
 
-public abstract class BuscadorAbstracto implements Buscador, BuscadorSimple {
+public abstract class BuscadorAbstracto implements /*Buscador,*/ BuscadorSimple {
 
+	/*
 	@Override
 	public abstract ResultadoBusqueda busqueda(final Tablero tablero, final Jugador jugador, int alfa,
 			int beta, final int produndidad, final Evaluacion funcion);
-	
+	*/
 	@Override
-	public abstract ResultadoBusqueda busquedaSimple(final Tablero tablero, final Jugador jugador,
+	public abstract ResultadoBusqueda busquedaSimple(final Tablero tablero, TipoTablero tipoTablero, final EstadoCasilla colorJugador,
 			final int profundidad, final Evaluacion funcion);
 	
 	protected int maximo(int a, int b) {
@@ -56,6 +58,5 @@ public abstract class BuscadorAbstracto implements Buscador, BuscadorSimple {
 				|| tablero.contar(EstadoCasilla.BLACK) == 0
 				|| tablero.contar(EstadoCasilla.WHITE) == 0;
 	}
-	
 	
 }

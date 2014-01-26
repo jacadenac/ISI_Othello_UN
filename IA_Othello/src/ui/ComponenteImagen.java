@@ -8,7 +8,7 @@ import java.awt.MediaTracker;
 import javax.swing.JComponent;
 
 public class ComponenteImagen extends JComponent {
-	
+	private static final long serialVersionUID = 1L;
 	Image imagen;
 	Dimension size;
 	

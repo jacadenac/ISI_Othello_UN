@@ -16,9 +16,9 @@ import java.awt.Point;
 public class ResultadoBusqueda {
 	
 	private Point punto;
-	private int puntaje;
+	private double puntaje;
 	
-	public int obtenerPuntaje() {
+	public double obtenerPuntaje() {
 		return puntaje;
 	}
 	
@@ -30,7 +30,7 @@ public class ResultadoBusqueda {
 		return new ResultadoBusqueda(punto, -puntaje);
 	}
 	
-	public ResultadoBusqueda(Point punto, int puntaje) {
+	public ResultadoBusqueda(Point punto, double puntaje) {
 		this.punto = punto;
 		this.puntaje = puntaje;
 	}

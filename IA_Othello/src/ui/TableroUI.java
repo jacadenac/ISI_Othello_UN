@@ -14,14 +14,11 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -35,17 +32,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
 
 import ui.FabricaImagenCasilla.TipoCasilla;
 import utilidades.Transform;
 import othello.Othello;
-import othello.UIJuego;
-
 
 
 public final class TableroUI extends JFrame {
-	
+	private static final long serialVersionUID = 1L;
 	public static final int HUM_HUM = 0;
 	public static final int HUM_ROB = 1;
 	public static final int ROB_ROB = 2;
@@ -55,22 +49,17 @@ public final class TableroUI extends JFrame {
 
 	private final Image LOGO = new ImageIcon(getClass().getResource("/ui/imagenes/logo.jpg")).getImage();
 	private static int oponentes = HUM_HUM;
-	private static Jugador humano = Jugador.BLACK;
+	private static Jugador humano = new Jugador(EstadoCasilla.BLACK);
 	private List<ComponenteImagen> casillas;
 	private JPanel tablero;
 	private JLabel estadisticasBlanco;
 	private JLabel estadisticasNegro;
 	private JLabel mostrarTurno;
-	private JRadioButtonMenuItem[] diffbuttons;
 	private JMenuItem juegoNuevo;
 	private JMenuItem guardarJuego;
 	private JMenuItem abrirJuego;
-	private JRadioButtonMenuItem tableroClasico;
-	private JRadioButtonMenuItem tableroOctogonal;
-	private JRadioButtonMenuItem tableroPersonalizado;
-	private JRadioButtonMenuItem tablero10x10;
-	private JRadioButtonMenuItem tablero12x12;
-	private JRadioButtonMenuItem tablero14x14;
+	private JRadioButtonMenuItem[] tipoTableroButton;
+	private JRadioButtonMenuItem[] tamTableroButton;
 	private Tablero tableroLogica;
 	private JPanel barraEstado;
 	private JPanel barraBoton;
@@ -79,10 +68,8 @@ public final class TableroUI extends JFrame {
 	TipoTablero tipoTablero;
 
 	
-	
 	public TableroUI() throws HeadlessException {
 		casillas = new ArrayList<ComponenteImagen>(largoTablero*anchoTablero);
-		//iniciarComponentes(this.getContentPane());
 		tipoTablero=TipoTablero.CLASICO;
 		iniciarComponentes();
 		this.pack();
@@ -139,7 +126,6 @@ public final class TableroUI extends JFrame {
 		guardarJuego = new JMenuItem("Guardar");
 		menu.add(guardarJuego);
 		
-		
 		/* ------ Salir del juego -----*/
 		exit = new JMenuItem("Salir");
 		menu.add(exit);
@@ -147,7 +133,6 @@ public final class TableroUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent evt){System.exit(0);}
 		});
-		
 		
 		/*
 		 *  EDICION
@@ -163,7 +148,7 @@ public final class TableroUI extends JFrame {
 		radiobutton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				humano = Jugador.BLACK;
+				humano = new Jugador(EstadoCasilla.BLACK);
 			}
 		}); 
 		buttongroup.add(radiobutton);
@@ -172,7 +157,7 @@ public final class TableroUI extends JFrame {
 		radiobutton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				humano = Jugador.WHITE;
+				humano = new Jugador(EstadoCasilla.WHITE);
 			}
 		});
 		buttongroup.add(radiobutton);
@@ -218,26 +203,27 @@ public final class TableroUI extends JFrame {
 		submenu = new JMenu("Elegir tablero");
 		buttongroup = new ButtonGroup();
 		
-		tableroClasico = new JRadioButtonMenuItem("CLASICO");
+		tipoTableroButton = new JRadioButtonMenuItem[3];
+		tipoTableroButton[0] = new JRadioButtonMenuItem("CLASICO");
+		buttongroup.add(tipoTableroButton[0] );
+		submenu.add(tipoTableroButton[0] );
 		if (tipoTablero == TipoTablero.CLASICO) {
-			tableroClasico.setSelected(true);
+			tipoTableroButton[0].setSelected(true);
 		}
-		buttongroup.add(tableroClasico);
-		submenu.add(tableroClasico);
 		
-		tableroOctogonal = new JRadioButtonMenuItem("OCTOGONAL");
+		tipoTableroButton[1]  = new JRadioButtonMenuItem("OCTOGONAL");
+		buttongroup.add(tipoTableroButton[1] );
+		submenu.add(tipoTableroButton[1] );
 		if (tipoTablero == TipoTablero.OCTOGONAL) {
-			tableroOctogonal.setSelected(true);
+			tipoTableroButton[1].setSelected(true);
 		}
-		buttongroup.add(tableroOctogonal);
-		submenu.add(tableroOctogonal);
 		
-		tableroPersonalizado = new JRadioButtonMenuItem("PERSONALIZADO");
+		tipoTableroButton[2]  = new JRadioButtonMenuItem("PERSONALIZADO");
+		buttongroup.add(tipoTableroButton[2] );
+		submenu.add(tipoTableroButton[2]);
 		if (tipoTablero == TipoTablero.PERSONALIZADO) {
-			tableroPersonalizado.setSelected(true);
+			tipoTableroButton[2].setSelected(true);
 		}
-		buttongroup.add(tableroPersonalizado);
-		submenu.add(tableroPersonalizado);
 		
 		menu.add(submenu);
 		
@@ -245,26 +231,34 @@ public final class TableroUI extends JFrame {
 		submenu = new JMenu("Dimensiones");
 		buttongroup = new ButtonGroup();
 		
-		tablero10x10 = new JRadioButtonMenuItem("10 x 10");
+		tamTableroButton = new JRadioButtonMenuItem[4];
+		tamTableroButton [0] = new JRadioButtonMenuItem("10 x 10");
+		buttongroup.add(tamTableroButton [0] );
+		submenu.add(tamTableroButton [0] );
 		if (largoTablero == 10 && anchoTablero == 10) {
-			tablero10x10.setSelected(true);
+			tamTableroButton [0].setSelected(true);
 		}
-		buttongroup.add(tablero10x10);
-		submenu.add(tablero10x10);
 		
-		tablero12x12 = new JRadioButtonMenuItem("12 x 12");
+		tamTableroButton [1]  = new JRadioButtonMenuItem("12 x 12");
+		buttongroup.add(tamTableroButton [1] );
+		submenu.add(tamTableroButton [1] );
 		if (largoTablero == 12 && anchoTablero == 12) {
-			tablero12x12.setSelected(true);
+			tamTableroButton [1].setSelected(true);
 		}
-		buttongroup.add(tablero12x12);
-		submenu.add(tablero12x12);
 		
-		tablero14x14 = new JRadioButtonMenuItem("14 x 14");
+		tamTableroButton [2]  = new JRadioButtonMenuItem("14 x 14");
+		buttongroup.add(tamTableroButton [2] );
+		submenu.add(tamTableroButton [2]);
 		if (largoTablero == 14 && anchoTablero == 14) {
-			tablero14x14.setSelected(true);
+			tamTableroButton [2].setSelected(true);
 		}
-		buttongroup.add(tablero14x14);
-		submenu.add(tablero14x14);
+		
+		tamTableroButton [3]  = new JRadioButtonMenuItem("16 x 16");
+		buttongroup.add(tamTableroButton [3] );
+		submenu.add(tamTableroButton [3]);
+		if (largoTablero == 16 && anchoTablero == 16) {
+			tamTableroButton [3].setSelected(true);
+		}
 		
 		menu.add(submenu);
 		
@@ -293,61 +287,28 @@ public final class TableroUI extends JFrame {
 		pane.add(barraMenu, constrains);
 		constrains.gridwidth = 0;
 		
-		/* Pintar las casillas */
-		/*
-		tablero = new JPanel (new GridLayout(largoTablero, anchoTablero));
-		for ( int fila = 0; fila < largoTablero; fila++){
-			for (int columna = 0; columna < anchoTablero; columna++){
-				//if (fila == 2 && columna == 3){
-				//	ComponenteImagen casillaMuro = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
-				//	tablero.add(casillaMuro);
-				//	continue;
-				//}
-				if(fila == 0 ||columna ==0 || fila == largoTablero-1 || columna == anchoTablero-1){
-					ComponenteImagen casillaMuro = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
-					tablero.add(casillaMuro);
-					casillas.add(casillaMuro);
-				}
-				else {
-					ComponenteImagen casillaVacia = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
-					tablero.add(casillaVacia);
-					casillas.add(casillaVacia);
-				}
-			}
-			
-		}
-		
-		// Pintar puntos de partida 
-		definirCasilla(new Point((int)(largoTablero/2)-1, (int)(anchoTablero/2)-1), TipoCasilla.WHITE);
-		definirCasilla(new Point((int)(largoTablero/2)-1, (int)(anchoTablero/2)), TipoCasilla.BLACK);
-		definirCasilla(new Point((int)(largoTablero/2), (int)(anchoTablero/2)-1), TipoCasilla.BLACK);
-		definirCasilla(new Point((int)(largoTablero/2), (int)(anchoTablero/2)), TipoCasilla.WHITE);
-		
-		//tablero = new InterfazTablero();
-		
-		 */
-		
+		/* Pintar las casillas */	
 		tablero = new JPanel (new GridLayout(largoTablero, anchoTablero));
 		ComponenteImagen casillaImagen;
 		
 		for ( int fila = 0; fila < largoTablero; fila++){
 			for (int columna = 0; columna < anchoTablero; columna++){
 				switch(tableroLogica.obtenerTablero().get(new Point(fila, columna))){
-				case EMPTY:
-					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
-					break;
-				case BLACK:
-					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.BLACK);
-					break;
-				case WHITE:
-					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.WHITE);
-					break;
-				case WALL:
-					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
-					break;
-				default:
-					casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
-					break;
+					case EMPTY:
+						casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
+						break;
+					case BLACK:
+						casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.BLACK);
+						break;
+					case WHITE:
+						casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.WHITE);
+						break;
+					case WALL:
+						casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.WALL);
+						break;
+					default:
+						casillaImagen = FabricaImagenCasilla.construirCasilla(TipoCasilla.EMPTY);
+						break;
 				}
 				tablero.add(casillaImagen);
 				casillas.add(casillaImagen);
@@ -406,22 +367,6 @@ public final class TableroUI extends JFrame {
 		mostrarBarraEstado();
 		
 	}
-	
-	/*public void crearBotonSalidaEdicion(){
-		GridBagConstraints constrains = new GridBagConstraints();
-		boton = new JButton("Salir de Edición");
-		boton.setBorder(BorderFactory.createEtchedBorder());
-		boton.setSize(20, 50);
-		//boton.setBackground(new Color(0, 60, 0));
-		barraBoton = new JPanel(new GridLayout());
-		barraBoton.add(boton);
-		constrains.weightx = 300;
-		constrains.weighty = 100;
-		constrains.gridx = 1;
-		constrains.gridy = 20;
-		pane.add(barraBoton, constrains);
-		mostrarBarraBoton();
-	}*/
 	
 	public void mostrarBarraEstado(){
 		barraBoton.setVisible(false);
@@ -490,13 +435,18 @@ public final class TableroUI extends JFrame {
 	}
 	
 	public void notificarTurnoPerdido(Jugador jugador){
-		String jug = jugador == Jugador.BLACK ? "Negras" : "Blancas";
+		/*String jug = jugador == Jugador.BLACK ? "Negras" : "Blancas";
+		JOptionPane.showMessageDialog(this, "No hay movidas disponibles, " + jug
+			    + " pierde su turno", "¡Bien Jugado!", JOptionPane.INFORMATION_MESSAGE);*/
+		String jug = jugador.color() == EstadoCasilla.BLACK ? "Negras" : "Blancas";
 		JOptionPane.showMessageDialog(this, "No hay movidas disponibles, " + jug
 			    + " pierde su turno", "¡Bien Jugado!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public void notificarVictoria(Jugador jugador) {
-		String ganador = jugador == Jugador.BLACK ? "Negras" : "Blancas";
+		/*String ganador = jugador == Jugador.BLACK ? "Negras" : "Blancas";
+		JOptionPane.showMessageDialog(this, "¡¡" + ganador + " gana!! ", "¡Buena Partida!", JOptionPane.INFORMATION_MESSAGE);*/
+		String ganador = jugador.color() == EstadoCasilla.BLACK ? "Negras" : "Blancas";
 		JOptionPane.showMessageDialog(this, "¡¡" + ganador + " gana!! ", "¡Buena Partida!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -516,32 +466,13 @@ public final class TableroUI extends JFrame {
 		return abrirJuego;
 	}
 	
-	public JRadioButtonMenuItem obtenerTableroClasico(){
-		return tableroClasico;
+	public JRadioButtonMenuItem[] obtenerTipoTableroButton(){
+		return tipoTableroButton;
 	}
-	public JRadioButtonMenuItem obtenerTableroOctogonal(){
-		return tableroOctogonal;
+	public JRadioButtonMenuItem[] obtenerTamTableroButton(){
+		return tamTableroButton;
 	}
-	
-	public JRadioButtonMenuItem obtenerTableroPersonalizado(){
-		return tableroPersonalizado;
-	}
-	
-	public JRadioButtonMenuItem obtenerTablero10x10(){
-		return tablero10x10;
-	}
-	
-	public JRadioButtonMenuItem obtenerTablero12x12(){
-		return tablero12x12;
-	}
-	
-	public JRadioButtonMenuItem obtenerTablero14x14(){
-		return tablero14x14;
-	}
-
-	
-	
-	
+		
 	public JButton obtenerBoton(){
 		return boton;
 	}
@@ -553,24 +484,5 @@ public final class TableroUI extends JFrame {
 	public int obtenerOponentes(){
 		return oponentes;
 	}
-	
 
-	
-	/*MODIFICADOS!!*/
-	/*private void definirCasilla(Point point, TipoCasilla tipoCasilla) {
-		tablero.definirCasilla(point, tipoCasilla);
-	}
-	
-	public void marcarMovidasPosibles(Collection<Point> movidasPosibles, TipoCasilla color){
-		tablero.marcarMovidasPosibles(movidasPosibles, color);
-	}
-	
-	public void desmarcarMovidasPosibles(Collection<Point> movidasPosibles){
-		tablero.desmarcarMovidasPosibles(movidasPosibles);
-	}
-	
-	public void rellenar(Collection<Point> puntosConRelleno, TipoCasilla color){
-		tablero.rellenar(puntosConRelleno, color);
-
-	}*/
 }

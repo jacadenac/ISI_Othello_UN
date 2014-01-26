@@ -3,8 +3,9 @@ package logica.ia.buscadores;
 import java.awt.Point;
 import java.util.Set;
 
-import core.Jugador;
+import core.EstadoCasilla;
 import core.Tablero;
+import core.Tablero.TipoTablero;
 import logica.ExploradorMovimientos;
 import logica.ia.evaluacion.Evaluacion;
 
@@ -25,18 +26,19 @@ import logica.ia.evaluacion.Evaluacion;
  * 
  */
 
-public class NegaMax extends BuscadorAbstracto implements Buscador, BuscadorSimple {
+public class NegaMax extends BuscadorAbstracto implements /*Buscador,*/ BuscadorSimple {
 
+	/*
 	@Override
 	public ResultadoBusqueda busqueda(final Tablero tablero, final Jugador jugador, int alfa, int beta, final int profundidad, final Evaluacion evfuncion) {
 		if(profundidad <= 0 || esEstadoFinal(tablero)) {
-			return new ResultadoBusqueda(null, evfuncion.evaluar(tablero, jugador));
-		} else { /* Hay más para revisar */
+			return new ResultadoBusqueda(null, evfuncion.evaluar(tablero, jugador.color()));
+		} else { // Hay más para revisar 
 			Set<Point> movidasPosibles = ExploradorMovimientos.explorar(tablero, jugador.color());
 			ResultadoBusqueda mejor = new ResultadoBusqueda(null, alfa);
-			if(movidasPosibles.isEmpty()) { /* se pierde turno - revisar siguiente jugador */
+			if(movidasPosibles.isEmpty()) { // se pierde turno - revisar siguiente jugador 
 				movidasPosibles = ExploradorMovimientos.explorar(tablero, jugador.oponente().color());
-				if(movidasPosibles.isEmpty()) { /* fin del juego - ¿existe un ganador? */
+				if(movidasPosibles.isEmpty()) { // fin del juego - ¿existe un ganador? 
 					switch (Integer.signum(tablero.contar(jugador.color()) - tablero.contar(jugador.oponente().color()))) {
 						case -1:
 							mejor = new ResultadoBusqueda(null, Integer.MIN_VALUE);
@@ -48,10 +50,10 @@ public class NegaMax extends BuscadorAbstracto implements Buscador, BuscadorSimp
 							mejor = new ResultadoBusqueda(null, Integer.MAX_VALUE);
 							break;
 					}
-				} else { /* El juego continua - no hay movidas por revisar */
+				} else { // El juego continua - no hay movidas por revisar
 					mejor = busqueda(tablero, jugador.oponente(), -beta, -alfa, profundidad - 1, evfuncion).negado();
 				}
-			} else { /* revisar el puntaje de cada movida */
+			} else { // revisar el puntaje de cada movida
 				for (Point siguienteMovimientoPosible : movidasPosibles) {
 					Tablero subTablero = tablero.clone();
 					subTablero.hacerMovimiento(siguienteMovimientoPosible, jugador.color());
@@ -60,7 +62,7 @@ public class NegaMax extends BuscadorAbstracto implements Buscador, BuscadorSimp
 						alfa = puntaje;
 						mejor = new ResultadoBusqueda(siguienteMovimientoPosible, puntaje);
 					}
-					/* Poda Alfa Beta */
+					// Poda Alfa Beta
 					if (alfa >= beta) {
 						return mejor;
 					}
@@ -69,18 +71,27 @@ public class NegaMax extends BuscadorAbstracto implements Buscador, BuscadorSimp
 			return mejor;
 		}
 	}
+	*/
 
 	@Override
-	public ResultadoBusqueda busquedaSimple(Tablero tablero, Jugador jugador, int profundidad, Evaluacion evfuncion) {
+	public ResultadoBusqueda busquedaSimple(Tablero tablero, TipoTablero tipoTablero,  EstadoCasilla colorJugador, int profundidad, Evaluacion evfuncion) {
+		
+		EstadoCasilla colorOponente;
+		if (colorJugador == EstadoCasilla.BLACK){
+			colorOponente = EstadoCasilla.WHITE;
+		} else {
+			colorOponente = EstadoCasilla.BLACK;
+		}
+		
 		if (profundidad <= 0 || esEstadoFinal(tablero)) {
-			return new ResultadoBusqueda(null, evfuncion.evaluar(tablero, jugador));
+			return new ResultadoBusqueda(null, evfuncion.evaluar(tablero, tipoTablero, colorJugador));
 		} else { /* hay más para revisar */
-			Set<Point> movidasPosibles = ExploradorMovimientos.explorar(tablero, jugador.color());
+			Set<Point> movidasPosibles = ExploradorMovimientos.explorar(tablero, colorJugador);
 			ResultadoBusqueda mejor = new ResultadoBusqueda(null, Integer.MIN_VALUE);
 			if (movidasPosibles.isEmpty()) { /* se pierde turno - revisar siguiente jugador */
-				movidasPosibles = ExploradorMovimientos.explorar(tablero, jugador.oponente().color());
+				movidasPosibles = ExploradorMovimientos.explorar(tablero, colorOponente);
 				if (movidasPosibles.isEmpty()) { /* fin del juego - ¿existe un ganador? */
-					switch (Integer.signum(tablero.contar(jugador.color()) - tablero.contar(jugador.oponente().color()))){
+					switch (Integer.signum(tablero.contar(colorJugador) - tablero.contar(colorOponente))){
 						case -1:
 							mejor = new ResultadoBusqueda(null, Integer.MIN_VALUE);
 							break;
@@ -92,13 +103,13 @@ public class NegaMax extends BuscadorAbstracto implements Buscador, BuscadorSimp
 							break;
 					}
 				} else { /* El juego continua - no hay movidas por revisar */
-					mejor = busquedaSimple(tablero, jugador.oponente(), profundidad-1, evfuncion).negado();
+					mejor = busquedaSimple(tablero, tipoTablero, colorOponente, profundidad-1, evfuncion).negado();
 				}
 			} else { /* revisar el puntaje de cada movida */
 				for (Point siguienteMovimientoPosible : movidasPosibles) {
 					Tablero subTablero = tablero.clone();
-					subTablero.hacerMovimiento(siguienteMovimientoPosible, jugador.color());
-					int puntaje = busquedaSimple(subTablero, jugador.oponente(), profundidad-1, evfuncion).negado().obtenerPuntaje();
+					subTablero.hacerMovimiento(siguienteMovimientoPosible, colorJugador);
+					double puntaje = busquedaSimple(subTablero, tipoTablero, colorOponente, profundidad-1, evfuncion).negado().obtenerPuntaje();
 					if (mejor.obtenerPuntaje() < puntaje) {
 						/* asignar el mejor puntaje y la movida correspondiente */
 						mejor = new ResultadoBusqueda(siguienteMovimientoPosible, puntaje);

@@ -1,38 +1,29 @@
 package othello;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
+
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.filechooser.FileFilter;
 
-import com.sun.org.apache.xpath.internal.Arg;
-
 import core.EstadoCasilla;
-import core.Jugador;
 import core.Tablero;
 import core.Tablero.TipoTablero;
 
@@ -41,6 +32,7 @@ import logica.Controlador;
 import ui.ComponenteImagen;
 import ui.FabricaImagenCasilla.TipoCasilla;
 import ui.TableroUI;
+
 import utilidades.Transform;
 
 public class UIJuego implements Runnable{
@@ -65,30 +57,27 @@ public class UIJuego implements Runnable{
 			return false;
 		}
 	});
-	private static final File directorio = new File("tableros");
-	private TipoTablero tipoTablero;
-	private int tamElegido;
+	private static final File directorio = new File("saves");
+
 	
 	
 	public UIJuego() {
 		super();
 		this.controlador.inicializar();
-		tamElegido = 10;
-		tipoTablero = TipoTablero.CLASICO;
+		controlador.inicializar(10, 10, TipoTablero.CLASICO);
 		iniciarTableroUI();
 	}
 	
-	private void iniciarTableroUI(){
+	private void iniciarTableroUI(){		
 		this.estaModificandoTablero = false;
+		TipoTablero tipoTablero = controlador.obtenerTableroLogica().obtenerTipoTablero();
 		tableroUI = new TableroUI(Tablero.TABLERO_LARGO,Tablero.TABLERO_ANCHO, controlador.obtenerTableroLogica(), tipoTablero);
 		tableroUI.setVisible(true);
+		
 		tableroUI.obtenerItemNuevoJuego().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tableroUI.dispose();
-				controlador.inicializar();
-				iniciarTableroUI();
-				run();
+					definirTipoTablero(obtenerTamTableroElegido(), obtenerTipoTableroElegido());
 			}
 		});
 		
@@ -104,7 +93,7 @@ public class UIJuego implements Runnable{
 				   File fichero = fileChooser.getSelectedFile();
 				   try {
 					   tableroUI.dispose();
-					   leerArchivo(fichero);
+					   leerArchivo(fichero, null);
 					   tableroUI = new TableroUI(Tablero.TABLERO_LARGO,Tablero.TABLERO_ANCHO, controlador.obtenerTableroLogica(), null);
 					   iniciarTableroUI();
 					   run();
@@ -119,119 +108,87 @@ public class UIJuego implements Runnable{
 			@Override
 			public void actionPerformed(ActionEvent e) {				
 				JFileChooser fileChooser = new JFileChooser();
-				//directorio.mkdirs());
+				directorio.mkdirs();
 				fileChooser.setCurrentDirectory(directorio);		
 				fileChooser.setFileFilter(miFiltro);
 				int seleccion = fileChooser.showSaveDialog(tableroUI);
 				if (seleccion == JFileChooser.APPROVE_OPTION)
 				{
-				   String path =  fileChooser.getSelectedFile().getAbsolutePath()+".oth";
+				   String path = fileChooser.getSelectedFile().getAbsolutePath();
+				   String extension =  miFiltro.getDescription().substring(miFiltro.getDescription().length()-4);
+				   if (!path.substring(path.length()-4).equals(extension)){
+					   path = path + extension;
+				   }
 				   File fichero = new File(path);
 				   escribirArchivo(fichero);			   
 				}
+			}
+		});
 
-			}
-		});
+		for (final JRadioButtonMenuItem tipoTableroButton : tableroUI.obtenerTipoTableroButton()) {
+			tipoTableroButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					definirTipoTablero(obtenerTamTableroElegido(), obtenerTipoTableroElegido());
+				}
+			});
+		}
 		
-		tableroUI.obtenerTableroClasico().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tipoTablero = TipoTablero.CLASICO;
-				definirTipoTablero(tamElegido, tipoTablero);
-			}
-		});
-				
-		tableroUI.obtenerTableroOctogonal().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tipoTablero = TipoTablero.OCTOGONAL;
-				definirTipoTablero(tamElegido, tipoTablero);
-			}
-		});
-		
-		tableroUI.obtenerTableroPersonalizado().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tipoTablero = TipoTablero.PERSONALIZADO;
-				definirTipoTablero(tamElegido, tipoTablero);
-			}
-		});
-		
-		tableroUI.obtenerTablero10x10().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tableroUI.obtenerTablero10x10().setSelected(true);
-				tamElegido = 10;
-				definirTipoTablero(tamElegido, tipoTablero);
-			}
-		});
-		
-		tableroUI.obtenerTablero12x12().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tableroUI.obtenerTablero12x12().setSelected(true);
-				tamElegido = 12;
-				definirTipoTablero(tamElegido, tipoTablero);
-			}
-		});
-		
-		tableroUI.obtenerTablero14x14().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tableroUI.obtenerTablero14x14().setSelected(true);
-				tamElegido = 14;
-				definirTipoTablero(tamElegido, tipoTablero);
-			}
-		});
-		
-		
+		for (final JRadioButtonMenuItem tamTableroButton : tableroUI.obtenerTamTableroButton()) {
+			tamTableroButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					definirTipoTablero(obtenerTamTableroElegido(), obtenerTipoTableroElegido());
+				}
+			});
+		}		
 	}
 	
 	@Override
 	public void run() {
-		if (controlador.estaJuegoTerminado){
-			
-		}
-		else if (controlador.finDelJuego()) {	
+
+		if ( controlador.finDelJuego()) {	
 			juegoTerminado();
-			controlador.estaJuegoTerminado = true;
-		} else {
-			if (estaModificandoTablero) {
-				tableroUI.obtenerBoton().addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						estaModificandoTablero = false;
-						//guardarConfiguraciónEnUnArchivo (opcional)  tableroUI.obtener.item -> Archivo -> Guardar addActionListener
-						tableroUI.mostrarBarraEstado();
-						run();
-					}
-				});
-				ActualizarListeners();
-			} else {
-				movidasPosibles = marcarMovidasPosibles();
-				if (movidasPosibles.isEmpty()) {
-					pasar();
+		}
+		if (!controlador.finDelJuego() && estaModificandoTablero) {
+			tableroUI.obtenerBoton().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					estaModificandoTablero = false;
+					//guardarConfiguraciónEnUnArchivo (opcional)  tableroUI.obtener.item -> Archivo -> Guardar addActionListener
+					tableroUI.mostrarBarraEstado();
 					run();
 				}
-				
-				if (controlador.jugadorActual() != tableroUI.obtenerJugadorSeleccionado()
-						&& tableroUI.obtenerOponentes() == tableroUI.HUM_ROB
-						&& !controlador.finDelJuego()) {		
-					tableroUI.desmarcarMovidasPosibles(movidasPosibles);
-					Point movidaComputador = controlador.evaluarMovida();
-					hacerMovida(movidaComputador);
-					despuesDeMovida();
-				}
-				
-				if (tableroUI.obtenerOponentes() == tableroUI.ROB_ROB && !controlador.finDelJuego()) {		
-					tableroUI.desmarcarMovidasPosibles(movidasPosibles);
-					Point movidaComputador = controlador.evaluarMovida();
-					hacerMovida(movidaComputador);
-					System.out.println("entró a jugar PC"+controlador.jugadorActual().toString());
-					despuesDeMovida();
-				}
+			});
+		ActualizarListeners();
+		}
+		
+		if (!controlador.finDelJuego() && !estaModificandoTablero) {
+			movidasPosibles = marcarMovidasPosibles();
+			if (movidasPosibles.isEmpty()) {
+				pasar();
+				run();
 			}
-		}	
+			
+			if (controlador.jugadorActual().color() != tableroUI.obtenerJugadorSeleccionado().color()
+					&& tableroUI.obtenerOponentes() == TableroUI.HUM_ROB
+					&& !controlador.finDelJuego()) {		
+				tableroUI.desmarcarMovidasPosibles(movidasPosibles);
+				Point movidaComputador = controlador.evaluarMovida();
+				hacerMovida(movidaComputador);
+				despuesDeMovida();
+			}
+				
+			if (tableroUI.obtenerOponentes() == TableroUI.ROB_ROB && !controlador.finDelJuego()) {		
+				tableroUI.desmarcarMovidasPosibles(movidasPosibles);
+				Point movidaComputador = controlador.evaluarMovida();
+				hacerMovida(movidaComputador);
+				//System.out.println("entró a jugar PC"+controlador.jugadorActual().color().toString());
+				despuesDeMovida();
+			}
+		}
 	}
 	
 	private Set<Point> marcarMovidasPosibles() {
@@ -291,8 +248,6 @@ public class UIJuego implements Runnable{
 		run();
 	}
 	
-	/*Falta añadir aSucedidoClick para añadir muros al tablero*/
-
 	private void hacerMovida(Point movida) {
 		TipoCasilla color = controlador.jugadorActual().color() == EstadoCasilla.WHITE
 				? TipoCasilla.WHITE : TipoCasilla.BLACK;
@@ -312,7 +267,7 @@ public class UIJuego implements Runnable{
 	}
 
 	private void turnoPerdido() {
-		if(tableroUI.obtenerOponentes() != tableroUI.ROB_ROB){
+		if(tableroUI.obtenerOponentes() != TableroUI.ROB_ROB){
 			tableroUI.notificarTurnoPerdido(controlador.jugadorActual());
 		}
 		cambiarTurno();
@@ -332,9 +287,31 @@ public class UIJuego implements Runnable{
 		if (controlador.esEmpate()) {
 			tableroUI.declararEmpate();
 		} else {
-			String ganador = controlador.obtenerGanador() == Jugador.BLACK ? "Negras" : "Blancas";
+			String ganador = controlador.obtenerGanador().color() == EstadoCasilla.BLACK ? "Negras" : "Blancas";
 			tableroUI.declararGanador(ganador);
 			tableroUI.notificarVictoria(controlador.obtenerGanador());
+		}
+	}
+	
+	public TipoTablero obtenerTipoTableroElegido(){
+		if (tableroUI.obtenerTipoTableroButton()[0].isSelected()) {
+			return TipoTablero.CLASICO;
+		} else if (tableroUI.obtenerTipoTableroButton()[1].isSelected()) {
+			return TipoTablero.OCTOGONAL;
+		} else {
+			return TipoTablero.PERSONALIZADO;
+		}
+	}
+	
+	public int obtenerTamTableroElegido(){
+		if (tableroUI.obtenerTamTableroButton()[0].isSelected()) {
+			return 10;
+		} else if (tableroUI.obtenerTamTableroButton()[1].isSelected()) {
+			return 12;
+		} else if (tableroUI.obtenerTamTableroButton()[2].isSelected()) {
+			return 14;
+		}else {
+			return 16;
 		}
 	}
 	
@@ -348,14 +325,15 @@ public class UIJuego implements Runnable{
 				nombreFichero = "Octogonal12x12.oth";
 			} else if (tamanio == 14) {
 				nombreFichero = "Octogonal14x14.oth";
-			} else {
-				nombreFichero = "Octogonal10x10.oth";
+			} else if (tamanio == 16) {
+				nombreFichero = "Octogonal16x16.oth";
 			}
+			File directorio = new File("tableros");
 			File fichero = new File(directorio.getPath(),nombreFichero);
 			fileChooser.setCurrentDirectory(fichero);		
 			fileChooser.setFileFilter(miFiltro);
 			try {
-				leerArchivo(fichero);
+				leerArchivo(fichero, tipoTablero);
 				tableroUI = new TableroUI(Tablero.TABLERO_LARGO, Tablero.TABLERO_ANCHO, controlador.obtenerTableroLogica(), tipoTablero);
 				iniciarTableroUI();
 			} catch (FileNotFoundException e1) {
@@ -383,19 +361,25 @@ public class UIJuego implements Runnable{
 	private void escribirArchivo(File fichero) {
 		PrintWriter writer;
 		try {
+			int casillasJugablesIniciales=0;
 			writer = new PrintWriter(fichero);
 			Map<Point, EstadoCasilla> tableroActual = controlador.obtenerTableroLogica().obtenerTablero();
-			writer.println(tableroUI.largoTablero + "," + tableroUI.anchoTablero + "," + controlador.jugadorActual().color());
+			writer.println(TableroUI.largoTablero + "," + TableroUI.anchoTablero + "," + controlador.jugadorActual().color()
+					+ "," + obtenerTipoTableroElegido());
 			for(Point point : tableroActual.keySet()) {
 				writer.println(point.x + "," + point.y + "," + tableroActual.get(point).toString());
+				if(tableroActual.get(point) != EstadoCasilla.WALL){
+					casillasJugablesIniciales++;
+				}
 			}
+			writer.println("-"+casillasJugablesIniciales);
 			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void leerArchivo(final File fichero) throws FileNotFoundException {
+	private void leerArchivo(final File fichero, TipoTablero tipoTablero) throws FileNotFoundException {
 		BufferedReader reader;
 		int largoTablero=14;
 		int anchoTablero=14;
@@ -404,26 +388,33 @@ public class UIJuego implements Runnable{
 		boolean esTamaño=true;
 		
 		try {
+		    int casillasJugablesIniciales=0;
 			reader = new BufferedReader(new FileReader(fichero));
 			String linea = reader.readLine();
 			while (linea != null)
 			{
-				if(esTamaño){
-					String[] dimension = linea.split (",");
-					largoTablero = Integer.parseInt(dimension[0]);
-					anchoTablero = Integer.parseInt(dimension[1]);
-					colorJugador = EstadoCasilla.obtenerEstado(dimension[2]);
-					esTamaño = false;
-					
-			   } else {
-				    String[] campos = linea.split (",");
-				    
-				    Point punto = new Point(Integer.parseInt(campos[0]),Integer.parseInt(campos[1]));
-				    crearTablero.put(punto, EstadoCasilla.obtenerEstado(campos[2]));
-			   }
+				if (linea.toCharArray()[0] == '-') {
+					casillasJugablesIniciales = Integer.parseInt(linea.substring(1, linea.length()));
+				} else {
+					if(esTamaño){
+						String[] dimension = linea.split (",");
+						largoTablero = Integer.parseInt(dimension[0]);
+						anchoTablero = Integer.parseInt(dimension[1]);
+						colorJugador = EstadoCasilla.obtenerEstado(dimension[2]);
+						tipoTablero = Tablero.stringToTipoTablero(dimension[3]);
+						esTamaño = false;
+						
+				   } else {
+					    String[] campos = linea.split (",");
+					    
+					    Point punto = new Point(Integer.parseInt(campos[0]),Integer.parseInt(campos[1]));
+					    crearTablero.put(punto, EstadoCasilla.obtenerEstado(campos[2]));
+				   }
+				}
 			   linea = reader.readLine();
 			}
-			controlador.inicializar(crearTablero,colorJugador);
+			controlador.inicializar(crearTablero,colorJugador, tipoTablero);
+			Tablero.casillasjugablesIniciales = casillasJugablesIniciales;
 			Tablero.TABLERO_LARGO = largoTablero;
 			Tablero.TABLERO_ANCHO = anchoTablero;
 			reader.close();

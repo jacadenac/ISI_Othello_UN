@@ -10,13 +10,11 @@ import logica.ExploradorMovimientos;
 
 public class Tablero {
 	
-	//public static final int TABLERO_LARGO = 10;//14;
-	//public static final int TABLERO_ANCHO = 10;//14;
-	
 	public static int TABLERO_LARGO = 10;
 	public static int TABLERO_ANCHO = 10;
 	
 	private Map<Point, EstadoCasilla> tablero;
+	public static int casillasjugablesIniciales;
 	
 	public enum TipoTablero {
 		CLASICO,
@@ -28,6 +26,7 @@ public class Tablero {
 	public Tablero() {
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
 		this.tipoTablero = TipoTablero.CLASICO;
+		casillasjugablesIniciales = 0;
 		inicializar();
 	}
 	
@@ -35,21 +34,30 @@ public class Tablero {
 		TABLERO_LARGO = largo;
 		TABLERO_ANCHO = ancho;
 		this.tipoTablero = tipoTablero;
+		casillasjugablesIniciales = 0;
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
 		inicializar();
 	}
 	
-	public Tablero(Map<Point, EstadoCasilla> tablero) {
+	public Tablero(Map<Point, EstadoCasilla> tablero, TipoTablero tipoTablero) {
 		super();
-		this.tipoTablero = TipoTablero.PERSONALIZADO;
+		this.tipoTablero = tipoTablero;
+		casillasjugablesIniciales = 0;
+		if (tipoTablero == null) {
+			this.tipoTablero = TipoTablero.PERSONALIZADO;
+		}
 		this.tablero = new HashMap<Point, EstadoCasilla>(tablero.size());
 		for(Point point : tablero.keySet()) {
 			this.tablero.put(new Point(point), tablero.get(point));
+			if(tablero.get(point) == EstadoCasilla.EMPTY){
+				casillasjugablesIniciales++;
+			}
 		}
 		
 	}
 
 	public void inicializar() {
+		casillasjugablesIniciales = 0;
 		Point point = new Point();
 		for (point.x = 0; point.x < TABLERO_LARGO; point.x++) {
 			for (point.y = 0; point.y < TABLERO_ANCHO; point.y++) {
@@ -58,6 +66,7 @@ public class Tablero {
 				}
 				else {
 					tablero.put(new Point(point), EstadoCasilla.EMPTY);
+					casillasjugablesIniciales++;
 				}
 			}
 		}
@@ -66,12 +75,6 @@ public class Tablero {
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2), (int)(Tablero.TABLERO_LARGO/2)-1), EstadoCasilla.BLACK);
 		tablero.put(new Point((int)(Tablero.TABLERO_LARGO/2), (int)(Tablero.TABLERO_LARGO/2)), EstadoCasilla.WHITE);
 	}
-	
-	/*
-	public void inicializar(Map<Point, EstadoCasilla> tablero) {
-
-		}
-	}*/
 	
 	public Map<Point, EstadoCasilla> obtenerTablero(){
 		return tablero;
@@ -119,11 +122,7 @@ public class Tablero {
 			tablero.put(point, EstadoCasilla.PSSBL);
 		}
 	}
-	
-	/*public void crearTableroPersonalizado(Set<Point> points, EstadoCasilla estado) {
-		
-	}
-	*/
+
 	public void actualizarEstadoCasilla(Point punto, EstadoCasilla estadoCasilla) {
 		tablero.put(punto, estadoCasilla);
 	}
@@ -150,49 +149,26 @@ public class Tablero {
 		return casillasCambiadas;
 	}
 	
-	@Override
-	public String toString() {
-		Point point = new Point();
-		StringBuilder sb = new StringBuilder();
-		sb.append("  A B C D E F G H");
-		for (point.x = 0; point.x < TABLERO_LARGO; point.x++) {
-			sb.append('\n').append(point.x + 1);
-			for (point.y = 0; point.y < TABLERO_ANCHO; point.y++) {
-				sb.append(' ').append(tablero.get(point).symbol());
-			}
-		}
-		sb.append('\n');
-		return sb.toString();
+	public TipoTablero obtenerTipoTablero(){
+		return tipoTablero;
 	}
-	
+
 	@Override
 	public Tablero clone() {
-		return new Tablero(this.tablero);
+		return new Tablero(this.tablero, null);
 	}
 	
-	public String textoConEstadoTurno(Jugador jugador){
-		StringBuilder sb = new StringBuilder();
-		String[] filas = toString().split("\n");
-		for (int fila = 0; fila < filas.length; fila++) {
-			sb.append('\n').append(filas[fila]);
-			switch (fila) {
-				case 2:
-					sb.append('\t').append(EstadoCasilla.BLACK.symbol()).
-						append(' ').append(Jugador.BLACK).
-						append(": ").append(contar(EstadoCasilla.BLACK));
-					break;
-				case 4:
-					sb.append('\t').append(EstadoCasilla.WHITE.symbol()).
-						append(' ').append(Jugador.WHITE).
-						append(": ").append(contar(EstadoCasilla.WHITE));
-					break;
-				case 6:
-					sb.append('\t').append(jugador).append("su turno!");
-					break;
-			}
+	public static final TipoTablero stringToTipoTablero(String stringtipoTablero){
+		TipoTablero temp = TipoTablero.PERSONALIZADO;
+		if (stringtipoTablero.equals("CLASICO")) {
+			temp = TipoTablero.CLASICO;
 		}
-		sb.append('\n');
-		return sb.toString();
+		if (stringtipoTablero.equals("OCTOGONAL")) {
+			temp = TipoTablero.OCTOGONAL;
+		}if (stringtipoTablero.equals("PERSONALIZADO")) {
+			temp = TipoTablero.PERSONALIZADO;
+		}
+		return temp;
 	}
 
 }
