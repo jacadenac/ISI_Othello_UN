@@ -2,12 +2,14 @@ package othello;
 
 import java.awt.EventQueue;
 
-public class Juego{
-	public void jugar(){
+public class Juego extends Thread{
+
+	public void run() {
+		jugar();
+	}
+	
+	private void jugar(){
 		EventQueue.invokeLater(new UIJuego());
 	}
-	/*public void jugar(int largoTablero, int anchoTablero){
-		EventQueue.invokeLater(new UIJuego(largoTablero, anchoTablero));
-	}*/
 	
 }

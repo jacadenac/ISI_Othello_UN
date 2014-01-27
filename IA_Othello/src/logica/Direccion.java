@@ -3,14 +3,14 @@ package logica;
 import java.awt.Point;
 
 public enum Direccion {
-	/* ↑ */ NORTH(-1, 0),
-	/* ↓ */ SOUTH(+1, 0),
-	/* ← */ WEST(0, -1),
-	/* → */ EAST(0, +1),
-	/* ↖ */ NORTHWEST(-1, -1),
-	/* ↘ */ SOUTHEAST(+1, +1),
-	/* ↙ */ SOUTHWEST(+1, -1),
-	/* ↗ */ NORTHEAST(-1, +1);
+	/* â†‘ */ NORTH(-1, 0),
+	/* â†“ */ SOUTH(+1, 0),
+	/* â†� */ WEST(0, -1),
+	/* â†’ */ EAST(0, +1),
+	/* â†– */ NORTHWEST(-1, -1),
+	/* â†˜ */ SOUTHEAST(+1, +1),
+	/* â†™ */ SOUTHWEST(+1, -1),
+	/* â†— */ NORTHEAST(-1, +1);
 	private int pasoEnFila;
 	private int pasoEnColumna;
 
@@ -20,6 +20,10 @@ public enum Direccion {
 	}
 
 	public Point siguiente(Point point) {
+		/* */
+		if(point == null){
+			System.out.println("El punto es nulooooo!!!");
+		}
 		return new Point(point.x + pasoEnFila, point.y + pasoEnColumna);
 	}
 }

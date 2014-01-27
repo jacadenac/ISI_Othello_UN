@@ -14,7 +14,7 @@ public class Tablero {
 	public static int TABLERO_ANCHO = 10;
 	
 	private Map<Point, EstadoCasilla> tablero;
-	public static int casillasjugablesIniciales;
+	private static int casillasjugablesIniciales;
 	
 	public enum TipoTablero {
 		CLASICO,
@@ -26,7 +26,7 @@ public class Tablero {
 	public Tablero() {
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
 		this.tipoTablero = TipoTablero.CLASICO;
-		casillasjugablesIniciales = 0;
+		setCasillasjugablesIniciales(0);
 		inicializar();
 	}
 	
@@ -34,7 +34,7 @@ public class Tablero {
 		TABLERO_LARGO = largo;
 		TABLERO_ANCHO = ancho;
 		this.tipoTablero = tipoTablero;
-		casillasjugablesIniciales = 0;
+		setCasillasjugablesIniciales(0);
 		tablero = new HashMap<Point, EstadoCasilla>(TABLERO_LARGO * TABLERO_ANCHO);
 		inicializar();
 	}
@@ -42,7 +42,7 @@ public class Tablero {
 	public Tablero(Map<Point, EstadoCasilla> tablero, TipoTablero tipoTablero) {
 		super();
 		this.tipoTablero = tipoTablero;
-		casillasjugablesIniciales = 0;
+		setCasillasjugablesIniciales(0);
 		if (tipoTablero == null) {
 			this.tipoTablero = TipoTablero.PERSONALIZADO;
 		}
@@ -50,14 +50,14 @@ public class Tablero {
 		for(Point point : tablero.keySet()) {
 			this.tablero.put(new Point(point), tablero.get(point));
 			if(tablero.get(point) == EstadoCasilla.EMPTY){
-				casillasjugablesIniciales++;
+				setCasillasjugablesIniciales(getCasillasjugablesIniciales() + 1);
 			}
 		}
 		
 	}
 
 	public void inicializar() {
-		casillasjugablesIniciales = 0;
+		setCasillasjugablesIniciales(0);
 		Point point = new Point();
 		for (point.x = 0; point.x < TABLERO_LARGO; point.x++) {
 			for (point.y = 0; point.y < TABLERO_ANCHO; point.y++) {
@@ -66,7 +66,7 @@ public class Tablero {
 				}
 				else {
 					tablero.put(new Point(point), EstadoCasilla.EMPTY);
-					casillasjugablesIniciales++;
+					setCasillasjugablesIniciales(getCasillasjugablesIniciales() + 1);
 				}
 			}
 		}
@@ -169,6 +169,15 @@ public class Tablero {
 			temp = TipoTablero.PERSONALIZADO;
 		}
 		return temp;
+	}
+
+	public static int getCasillasjugablesIniciales() {
+		return casillasjugablesIniciales;
+	}
+
+	public static void setCasillasjugablesIniciales(
+			int casillasjugablesIniciales) {
+		Tablero.casillasjugablesIniciales = casillasjugablesIniciales;
 	}
 
 }

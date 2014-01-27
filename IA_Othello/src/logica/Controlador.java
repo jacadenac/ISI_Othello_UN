@@ -1,9 +1,6 @@
 package logica;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +24,7 @@ public final class Controlador {
 	private Jugador jugadorBlanco;
 	private Jugador jugadorNegro;
 	private Turno turno;
-	public static final int PROFUNDIDAD_POR_DEFECTO = 4;
+	public static final int PROFUNDIDAD_POR_DEFECTO = 1;
 	private static int profundidad = PROFUNDIDAD_POR_DEFECTO;
 	/* 0: todos bien , 1: uno no puede mover , 2: ninguno puede mover */
 	private final short PUEDEMOVER = 0, NOPUEDEMOVER = 2;
@@ -45,6 +42,101 @@ public final class Controlador {
 		super();
 		inicializar();
 		this.turno = Turno.NEGRAS;
+	}
+	
+	public void inicializar() {
+		this.tablero = 	new Tablero();
+		tablero.inicializar();
+		inicializarJugadores();
+		juegoTerminado=false;
+	}
+	
+	public void inicializar(int largoTablero, int anchoTablero, TipoTablero tipoTablero) {
+		this.tablero = 	new Tablero(largoTablero, anchoTablero, tipoTablero);
+		tablero.inicializar();
+		inicializarJugadores();
+		juegoTerminado=false;
+	}
+	
+	public void inicializar(Map<Point, EstadoCasilla> tablero, EstadoCasilla colorJugador, TipoTablero tipoTablero) {	
+		this.tablero = 	new Tablero(tablero, tipoTablero);
+		inicializarJugadores();
+		if (colorJugador == EstadoCasilla.WHITE) {
+			turno = Turno.BLANCAS;
+		} 		
+		juegoTerminado=false;
+	}
+	
+	private void inicializarJugadores(){
+		
+			/**
+			 * INICIALIZAR ESTRATEGIAS CON LAS DOS MEJORES HALLADAS HASTA EL MOMENTO
+			 */
+			int[] estrategiaNegro = {400,300,100,200};
+			int[] estrategiaBlanco = {250,500,50,200};
+			/**
+			 * INICIALIZAR ESTRATEGIAS CON LAS DOS MEJORES HALLADAS HASTA EL MOMENTO
+			 */
+		
+		jugadorNegro = new Jugador(EstadoCasilla.BLACK, 0, estrategiaNegro);
+		jugadorBlanco = new Jugador(EstadoCasilla.WHITE, 0, estrategiaBlanco);
+		turno = Turno.NEGRAS;
+		puedeMover = PUEDEMOVER;
+	}
+	
+	public void setEstrategiaJugadores(int[] estrategiaNegro, int[] estrategiaBlanco){
+		jugadorBlanco.setEstrategia(estrategiaBlanco);
+		jugadorNegro.setEstrategia(estrategiaNegro);
+	}
+	
+	public Set<Point> hacerMovimiento(Point movida) {
+		Set<Point> puntos;
+		if (this.turno == Turno.NEGRAS) {
+			puntos = tablero.hacerMovimiento(movida, jugadorNegro.color());
+			jugadorNegro.setPuntaje(tablero.contar(EstadoCasilla.BLACK));
+		} else {
+			puntos = tablero.hacerMovimiento(movida, jugadorBlanco.color());
+			jugadorBlanco.setPuntaje(tablero.contar(EstadoCasilla.WHITE));
+		}
+		
+		//porcentajeEsquinas(tablero, tablero.obtenerTipoTablero(), jugadorActual().color());
+		//porcentajeCasillasCentrales(tablero, jugadorActual().color());
+		
+		/**/
+
+				 	/*EvaluacionEstrategica funcionEvaluacion = new EvaluacionEstrategica(jugadorActual().getEstrategia());
+					double fx = funcionEvaluacion.evaluar(tablero, tablero.obtenerTipoTablero(), jugadorActual().color());
+					System.out.println(jugadorActual().color()+" -> "+ fx + " = "
+							+jugadorActual().getEstrategia()[0] + "*"+funcionEvaluacion.getX1()+" + "
+							+jugadorActual().getEstrategia()[1] + "*"+funcionEvaluacion.getX2()+" - "
+							+jugadorActual().getEstrategia()[2] + "*"+funcionEvaluacion.getX3()+" + "
+							+jugadorActual().getEstrategia()[3] + "*"+funcionEvaluacion.getX4()
+							);*/
+		
+		
+		/*System.out.println("Esquinas de Negro = " + esquinasNegro);
+		System.out.println("Esquinas de Blanco = " + esquinasBlanco);
+		System.out.println("Centrales de Negro = " + centralesNegro);
+		System.out.println("Centrales de Blanco = " + centralesBlanco);*/
+		return puntos;
+	}
+	
+	/* este método utiliza NegaMax y algoritmos genéticos.*/
+	public Point evaluarMovida() {
+		BuscadorAbstracto buscador;
+		buscador = new NegaMax();
+		Evaluacion funcionEvaluacion; // = new EvaluacionEstrategica(estrategia, tablero);
+		Point punto;
+		if (this.turno == Turno.NEGRAS) {
+			funcionEvaluacion = new EvaluacionEstrategica(jugadorNegro.getEstrategia());
+			punto = buscador.busquedaSimple(tablero, tablero.obtenerTipoTablero(), jugadorNegro.color(), 
+					profundidad, funcionEvaluacion).obtenerPunto();
+		} else {
+			funcionEvaluacion = new EvaluacionEstrategica(jugadorBlanco.getEstrategia());
+			punto = buscador.busquedaSimple(tablero, tablero.obtenerTipoTablero(), jugadorBlanco.color(), 
+					profundidad, funcionEvaluacion).obtenerPunto();
+		}
+		return punto;
 	}
 	
 	public Set<Point> marcarMovidasPosibles() {
@@ -66,25 +158,6 @@ public final class Controlador {
 	public void actualizarEstadoCasilla(Point punto, EstadoCasilla estadoCasilla) {
 		tablero.actualizarEstadoCasilla(punto, estadoCasilla);
 	}
-	
-	public Set<Point> hacerMovimiento(Point movida) {
-		Set<Point> puntos;
-		if (this.turno == Turno.NEGRAS) {
-			puntos = tablero.hacerMovimiento(movida, jugadorNegro.color());
-			jugadorNegro.setPuntaje(tablero.contar(EstadoCasilla.BLACK));
-		} else {
-			puntos = tablero.hacerMovimiento(movida, jugadorBlanco.color());
-			jugadorBlanco.setPuntaje(tablero.contar(EstadoCasilla.WHITE));
-		}
-		
-		porcentajeEsquinas(tablero, tablero.obtenerTipoTablero(), jugadorActual().color());
-		porcentajeCasillasCentrales(tablero, jugadorActual().color());
-		/*System.out.println("Esquinas de Negro = " + esquinasNegro);
-		System.out.println("Esquinas de Blanco = " + esquinasBlanco);
-		System.out.println("Centrales de Negro = " + centralesNegro);
-		System.out.println("Centrales de Blanco = " + centralesBlanco);*/
-		return puntos;
-	}
 
 	public int obtenerPuntajeNegro() {
 		jugadorNegro.setPuntaje(tablero.contar(EstadoCasilla.BLACK));
@@ -103,17 +176,6 @@ public final class Controlador {
 	public boolean esEmpate() {
 		return jugadorNegro.getPuntaje() == jugadorBlanco.getPuntaje();
 	}
-	
-	/**
-	 * El juego termina si: <br/>
-	 * <ol>
-	 * <li> el tablero está lleno</li>
-	 * <li> un jugador tiene puntaje = 0</li>
-	 * <li> ninguno tiene una siguiente movida válida</li>
-	 * </ol>
-	 *
-	 * @return si el juego está terminado
-	 */
 	
 	public boolean finDelJuego() {	
 		if(tablero.estaLleno() || verificarPuntajeEnCero() || puedeMover == NOPUEDEMOVER){
@@ -142,59 +204,8 @@ public final class Controlador {
 		}
 	}
 
-	public void inicializar() {
-		this.tablero = 	new Tablero();
-		tablero.inicializar();
-		inicializarJugadores();
-		juegoTerminado=false;
-	}
-	
-	public void inicializar(int largoTablero, int anchoTablero, TipoTablero tipoTablero) {
-		this.tablero = 	new Tablero(largoTablero, anchoTablero, tipoTablero);
-		tablero.inicializar();
-		inicializarJugadores();
-		juegoTerminado=false;
-	}
-	
-	public void inicializar(Map<Point, EstadoCasilla> tablero, EstadoCasilla colorJugador, TipoTablero tipoTablero) {	
-		this.tablero = 	new Tablero(tablero, tipoTablero);
-		inicializarJugadores();
-		if (colorJugador == EstadoCasilla.WHITE) {
-			turno = Turno.BLANCAS;
-		} 		
-		juegoTerminado=false;
-	}
-	
-	private void inicializarJugadores(){
-		//int[] estrategiaNegro = new int[4];
-		int[] estrategiaNegro = {1,1000,1,1};
-		int[] estrategiaBlanco = {1000,1,1,1};
-		jugadorNegro = new Jugador(EstadoCasilla.BLACK, 0, estrategiaNegro);
-		jugadorBlanco = new Jugador(EstadoCasilla.WHITE, 0, estrategiaBlanco);
-		turno = Turno.NEGRAS;
-		puedeMover = PUEDEMOVER;
-	}
-	
 	public Tablero obtenerTableroLogica(){
 		return tablero;
-	}
-		
-	/* este método utiliza NegaMax y algoritmos genéticos.*/
-	public Point evaluarMovida() {
-		BuscadorAbstracto buscador;
-		buscador = new NegaMax();
-		Evaluacion funcionEvaluacion; // = new EvaluacionEstrategica(estrategia, tablero);
-		Point punto;
-		if (this.turno == Turno.NEGRAS) {
-			funcionEvaluacion = new EvaluacionEstrategica(jugadorNegro.getEstrategia());
-			punto = buscador.busquedaSimple(tablero, tablero.obtenerTipoTablero(), jugadorNegro.color(), 
-					profundidad, funcionEvaluacion).obtenerPunto();
-		} else {
-			funcionEvaluacion = new EvaluacionEstrategica(jugadorBlanco.getEstrategia());
-			punto = buscador.busquedaSimple(tablero, tablero.obtenerTipoTablero(), jugadorBlanco.color(), 
-					profundidad, funcionEvaluacion).obtenerPunto();
-		}
-		return punto;
 	}
 	
 	private static class soporteControlador {
@@ -205,6 +216,7 @@ public final class Controlador {
 		return soporteControlador.INSTANCE;
 	}
 	
+	/*
 	private double porcentajeEsquinas(Tablero tablero, TipoTablero tipoTablero, EstadoCasilla colorJugador) {
 		
 		esquinasNegro=0;
@@ -214,7 +226,7 @@ public final class Controlador {
 		int esquinasJugador=0;
 		int esquinasRival=0;
 		EstadoCasilla colorRival = colorJugador == EstadoCasilla.BLACK ? EstadoCasilla.WHITE : EstadoCasilla.BLACK;
-		List<Point> ubicacionEsquinas;/* = detectarEsquinas(TipoTablero.CLASICO);*/		
+		List<Point> ubicacionEsquinas;// = detectarEsquinas(TipoTablero.CLASICO);		
 		totalEsquinas = 4;
 		if (tipoTablero  == TipoTablero.OCTOGONAL) {
 			totalEsquinas = 8;
@@ -263,6 +275,11 @@ public final class Controlador {
 			esquinas.add(new Point( Tablero.TABLERO_LARGO-1, (int)(Tablero.TABLERO_LARGO/2))   );
 		} else { //si es personalizado debe detectar número de esquinas
 			//detectarEsquinas();
+			esquinas = new ArrayList<Point>(4);
+			esquinas.add(new Point(1, 1));
+			esquinas.add(new Point(Tablero.TABLERO_LARGO-2, 1));
+			esquinas.add(new Point(1, Tablero.TABLERO_ANCHO-2));
+			esquinas.add(new Point(Tablero.TABLERO_LARGO-2, Tablero.TABLERO_ANCHO-2));
 			
 		}
 		return esquinas;
@@ -296,6 +313,6 @@ public final class Controlador {
 		}
 		return (double)(casillasCentralesJugador-casillasCentralesRival)/(double)totalCasillasCentrales;
 	}
-	
+	*/
 
 }

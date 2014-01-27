@@ -1,0 +1,57 @@
+
+------------------TORNEO 2107----------------- 
+
+Total partidas jugadas: 12
+
+*Juego número 1:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 0, 1000, 0, 0 ]
+     Ganó estrategia 1
+*Juego número 2:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 250, 500, 50, 200 ]
+     Ganó estrategia 1
+*Juego número 3:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 100, 100, 700, 100 ]
+     Ganó estrategia 1
+*Juego número 4:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 200, 100, 600, 100 ]
+     Ganó estrategia 1
+*Juego número 5:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 100, 50, 50, 800 ]
+     Ganó estrategia 1
+*Juego número 6:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 300, 100, 300, 300 ]
+     Ganó estrategia 1
+*Juego número 7:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 100, 400, 100, 400 ]
+     Ganó estrategia 1
+*Juego número 8:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 1000, 0, 0, 0 ]
+     Ganó estrategia 1
+*Juego número 9:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 50, 900, 10, 40 ]
+     Ganó estrategia 1
+*Juego número 10:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 0, 100, 400, 500 ]
+     Ganó estrategia 1
+*Juego número 11:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 700, 0, 100, 200 ]
+     Ganó estrategia 1
+*Juego número 12:
+     Estrategia 1 = [ 0, 801, 354, 258 ]
+     Estrategia 2 = [ 250, 250, 250, 250 ]
+     Ganó estrategia 1
+
+     Estrategia 1 obtuvo 12 victorias de 12.
+
+

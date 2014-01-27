@@ -57,7 +57,7 @@ public class UIJuego implements Runnable{
 			return false;
 		}
 	});
-	private static final File directorio = new File("saves");
+	private static final File directorio = new File("setup/saves");
 
 	
 	
@@ -328,7 +328,7 @@ public class UIJuego implements Runnable{
 			} else if (tamanio == 16) {
 				nombreFichero = "Octogonal16x16.oth";
 			}
-			File directorio = new File("tableros");
+			File directorio = new File("setup/boards");
 			File fichero = new File(directorio.getPath(),nombreFichero);
 			fileChooser.setCurrentDirectory(fichero);		
 			fileChooser.setFileFilter(miFiltro);
@@ -414,7 +414,7 @@ public class UIJuego implements Runnable{
 			   linea = reader.readLine();
 			}
 			controlador.inicializar(crearTablero,colorJugador, tipoTablero);
-			Tablero.casillasjugablesIniciales = casillasJugablesIniciales;
+			Tablero.setCasillasjugablesIniciales(casillasJugablesIniciales);
 			Tablero.TABLERO_LARGO = largoTablero;
 			Tablero.TABLERO_ANCHO = anchoTablero;
 			reader.close();

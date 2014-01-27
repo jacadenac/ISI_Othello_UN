@@ -28,51 +28,6 @@ import logica.ia.evaluacion.Evaluacion;
 
 public class NegaMax extends BuscadorAbstracto implements /*Buscador,*/ BuscadorSimple {
 
-	/*
-	@Override
-	public ResultadoBusqueda busqueda(final Tablero tablero, final Jugador jugador, int alfa, int beta, final int profundidad, final Evaluacion evfuncion) {
-		if(profundidad <= 0 || esEstadoFinal(tablero)) {
-			return new ResultadoBusqueda(null, evfuncion.evaluar(tablero, jugador.color()));
-		} else { // Hay más para revisar 
-			Set<Point> movidasPosibles = ExploradorMovimientos.explorar(tablero, jugador.color());
-			ResultadoBusqueda mejor = new ResultadoBusqueda(null, alfa);
-			if(movidasPosibles.isEmpty()) { // se pierde turno - revisar siguiente jugador 
-				movidasPosibles = ExploradorMovimientos.explorar(tablero, jugador.oponente().color());
-				if(movidasPosibles.isEmpty()) { // fin del juego - ¿existe un ganador? 
-					switch (Integer.signum(tablero.contar(jugador.color()) - tablero.contar(jugador.oponente().color()))) {
-						case -1:
-							mejor = new ResultadoBusqueda(null, Integer.MIN_VALUE);
-							break;
-						case 0:
-							mejor = new ResultadoBusqueda(null, 0);
-							break;
-						case 1:
-							mejor = new ResultadoBusqueda(null, Integer.MAX_VALUE);
-							break;
-					}
-				} else { // El juego continua - no hay movidas por revisar
-					mejor = busqueda(tablero, jugador.oponente(), -beta, -alfa, profundidad - 1, evfuncion).negado();
-				}
-			} else { // revisar el puntaje de cada movida
-				for (Point siguienteMovimientoPosible : movidasPosibles) {
-					Tablero subTablero = tablero.clone();
-					subTablero.hacerMovimiento(siguienteMovimientoPosible, jugador.color());
-					int puntaje = busqueda(subTablero, jugador.oponente(), -beta, -alfa, profundidad - 1, evfuncion).negado().obtenerPuntaje();
-					if (alfa < puntaje) {
-						alfa = puntaje;
-						mejor = new ResultadoBusqueda(siguienteMovimientoPosible, puntaje);
-					}
-					// Poda Alfa Beta
-					if (alfa >= beta) {
-						return mejor;
-					}
-				}
-			}
-			return mejor;
-		}
-	}
-	*/
-
 	@Override
 	public ResultadoBusqueda busquedaSimple(Tablero tablero, TipoTablero tipoTablero,  EstadoCasilla colorJugador, int profundidad, Evaluacion evfuncion) {
 		
@@ -116,6 +71,12 @@ public class NegaMax extends BuscadorAbstracto implements /*Buscador,*/ Buscador
 					}
 				}
 			}
+			
+			/**/Tablero subTablero2 = tablero.clone();
+			/**///subTablero2.hacerMovimiento(mejor, colorJugador);
+			evfuncion.evaluar(subTablero2, tipoTablero, colorJugador);
+			
+			
 			return mejor;
 		}
 	} 

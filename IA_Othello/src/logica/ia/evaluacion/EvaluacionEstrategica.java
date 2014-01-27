@@ -14,11 +14,11 @@ import java.util.Set;
 import logica.ExploradorMovimientos;
 
 public class EvaluacionEstrategica implements Evaluacion{
-	int A,B,C,D;
-	double x1;
-	double x2;
-	double x3;
-	double x4;
+	private int A,B,C,D;
+	private double x1;
+	private double x2;
+	private double x3;
+	private double x4;
 
 	public EvaluacionEstrategica(int[] estrategia) {
 		A = estrategia[0];
@@ -33,21 +33,30 @@ public class EvaluacionEstrategica implements Evaluacion{
 		x2 = porcentajeEsquinas(tablero, tipoTablero, colorJugador);
 		x3 = porcentajeJugadasPosiblesRival(tablero, colorJugador);
 		x4 = porcentajeCasillasCentrales(tablero, colorJugador);
-		return ((double)(A)*x1)+((double)(B)*x2)-((double)(C)*x3)+((double)(D)*x4);
+		return ((double)(A)*x1)+((double)(B)*x2)+((double)(C)*x3)+((double)(D)*x4);
 		
 	}
 	
 	private double porcentajePuntos(Tablero tablero, EstadoCasilla colorJugador) {
+		EstadoCasilla colorRival = colorJugador == EstadoCasilla.BLACK ? EstadoCasilla.WHITE : EstadoCasilla.BLACK;
+		int puntosJugador=0;
+		int puntosRival=0;
 		
+		puntosJugador = tablero.contar(colorJugador);
+		puntosRival = tablero.contar(colorRival);
+		int totalCasillasJugables = Tablero.getCasillasjugablesIniciales();
+		
+		return (double)(puntosJugador - puntosRival)/(double)totalCasillasJugables;
+
 		/* Este sólo sirve para tablero Clásico */ 
-		if (colorJugador == EstadoCasilla.BLACK){
+		/*if (colorJugador == EstadoCasilla.BLACK){
 			return (tablero.contar(colorJugador) - tablero.contar(EstadoCasilla.WHITE))/
 					(Tablero.TABLERO_LARGO*Tablero.TABLERO_ANCHO);
 		} else {
 			return tablero.contar(colorJugador) - tablero.contar(EstadoCasilla.BLACK)/
 					(Tablero.TABLERO_LARGO*Tablero.TABLERO_ANCHO);
-		}
-		
+		}*/
+		//int totalCasillasJugables = tablero.casillasjugablesIniciales;
 		/* Para otros tableros debe obtenerse el número total de casillas vacías inicialmente sumándole las 4 centrales */
 	}
 	
@@ -87,19 +96,27 @@ public class EvaluacionEstrategica implements Evaluacion{
 		Set<Point> movidasPosibles = ExploradorMovimientos.explorar(tablero, colorJugador);
 		if (movidasPosibles.isEmpty()) { /* se pierde turno - revisar siguiente jugador */
 			movidasPosibles = ExploradorMovimientos.explorar(tablero, colorRival);
-			movidasPosiblesRival = movidasPosibles.size();
-		}else { /* revisar el puntaje despues de una movida */
+			if (movidasPosibles.isEmpty()) { // fin del juego
+					return 0;
+			} else {
+				movidasPosiblesRival = movidasPosibles.size();
+			}
+		} else { /* revisar el puntaje después de una movida */
 			for (Point siguienteMovimientoPosible : movidasPosibles) {
 				Tablero subTablero = tablero.clone();
-				subTablero.hacerMovimiento(siguienteMovimientoPosible, colorJugador);
-				movidasPosibles = ExploradorMovimientos.explorar(subTablero, colorRival);
-				if(movidasPosibles.size() > movidasPosiblesRival){/*toma el peor de los casos (la mayor cantidad de libertades para el oponente)*/
-					movidasPosiblesRival = movidasPosibles.size();
+				if (siguienteMovimientoPosible != null) {
+					subTablero.hacerMovimiento(siguienteMovimientoPosible, colorJugador);
+					movidasPosibles = ExploradorMovimientos.explorar(subTablero, colorRival);
+					if (movidasPosibles.isEmpty()) { // fin del juego
+						return 0;
+					} else if(movidasPosibles.size() > movidasPosiblesRival){/*toma el peor de los casos (la mayor cantidad de libertades para el oponente)*/
+						movidasPosiblesRival = movidasPosibles.size();
+					}
 				}
 				
 			}
 		}
-		return (double)movidasPosiblesRival/(double)Tablero.casillasjugablesIniciales;  /*  /(double)totalCasillasJugables */
+		return -(double)movidasPosiblesRival/(double)Tablero.getCasillasjugablesIniciales();  /*  /(double)totalCasillasJugables */
 	}
 
 	private double porcentajeCasillasCentrales(Tablero tablero, EstadoCasilla colorJugador) {
@@ -158,6 +175,19 @@ public class EvaluacionEstrategica implements Evaluacion{
 			esquinas.add(new Point(Tablero.TABLERO_LARGO-2, Tablero.TABLERO_ANCHO-2));
 		}
 		return esquinas;
+	}
+	
+	public double getX1(){
+		return x1;
+	}
+	public double getX2(){
+		return x2;
+	}
+	public double getX3(){
+		return x3;
+	}
+	public double getX4(){
+		return x4;
 	}
 
 
