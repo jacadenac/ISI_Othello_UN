@@ -9,6 +9,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import logica.ExploradorMovimientos;
@@ -47,17 +48,6 @@ public class EvaluacionEstrategica implements Evaluacion{
 		int totalCasillasJugables = Tablero.getCasillasjugablesIniciales();
 		
 		return (double)(puntosJugador - puntosRival)/(double)totalCasillasJugables;
-
-		/* Este sólo sirve para tablero Clásico */ 
-		/*if (colorJugador == EstadoCasilla.BLACK){
-			return (tablero.contar(colorJugador) - tablero.contar(EstadoCasilla.WHITE))/
-					(Tablero.TABLERO_LARGO*Tablero.TABLERO_ANCHO);
-		} else {
-			return tablero.contar(colorJugador) - tablero.contar(EstadoCasilla.BLACK)/
-					(Tablero.TABLERO_LARGO*Tablero.TABLERO_ANCHO);
-		}*/
-		//int totalCasillasJugables = tablero.casillasjugablesIniciales;
-		/* Para otros tableros debe obtenerse el número total de casillas vacías inicialmente sumándole las 4 centrales */
 	}
 	
 	private double porcentajeEsquinas(Tablero tablero, TipoTablero tipoTablero, EstadoCasilla colorJugador) {	
@@ -65,14 +55,15 @@ public class EvaluacionEstrategica implements Evaluacion{
 		int esquinasJugador=0;
 		int esquinasRival=0;
 		EstadoCasilla colorRival = colorJugador == EstadoCasilla.BLACK ? EstadoCasilla.WHITE : EstadoCasilla.BLACK;
-		List<Point> ubicacionEsquinas;
+		List<Point> ubicacionEsquinas = detectarEsquinas(tablero, tipoTablero);
+		
 		totalEsquinas = 4;
 		if (tipoTablero  == TipoTablero.OCTOGONAL) {
 			totalEsquinas = 8;
-		} else if (tipoTablero  == TipoTablero.PERSONALIZADO){ //si es personalizado debe detectar número de esquinas
-			
+		} else if (tipoTablero  == TipoTablero.PERSONALIZADO){
+			totalEsquinas = ubicacionEsquinas.size();
 		}
-		ubicacionEsquinas = detectarEsquinas(tipoTablero);
+		
 		ListIterator<Point> iterador = ubicacionEsquinas.listIterator();
 		while( iterador.hasNext() ) {
 		       Point punto = (Point) iterador.next();
@@ -146,7 +137,7 @@ public class EvaluacionEstrategica implements Evaluacion{
 	}
 	
 
-	private List<Point> detectarEsquinas(TipoTablero tipoTablero) {
+	private List<Point> detectarEsquinas(Tablero tablero, TipoTablero tipoTablero) {
 		List<Point> esquinas = null;
 		if (tipoTablero == TipoTablero.CLASICO) {
 			esquinas = new ArrayList<Point>(4);
@@ -164,19 +155,47 @@ public class EvaluacionEstrategica implements Evaluacion{
 			esquinas.add(new Point( (int)((Tablero.TABLERO_ANCHO/2)), Tablero.TABLERO_LARGO-1) );
 			esquinas.add(new Point( Tablero.TABLERO_LARGO-1, (int)(Tablero.TABLERO_LARGO/2)-1) );
 			esquinas.add(new Point( Tablero.TABLERO_LARGO-1, (int)(Tablero.TABLERO_LARGO/2))   );
-		} else { //si es personalizado debe detectar número de esquinas
-			//detectarEsquinas();
-			
-			/* detectarEsquinas(Tablero tablero, TipoTablero tipoTablero) explorar el tablero para detectar las esquinas: deber retornar un ArrayList<Point>*/
-			esquinas = new ArrayList<Point>(4);
-			esquinas.add(new Point(1, 1));
-			esquinas.add(new Point(Tablero.TABLERO_LARGO-2, 1));
-			esquinas.add(new Point(1, Tablero.TABLERO_ANCHO-2));
-			esquinas.add(new Point(Tablero.TABLERO_LARGO-2, Tablero.TABLERO_ANCHO-2));
+		} if (tipoTablero == TipoTablero.PERSONALIZADO) { //si es personalizado debe detectar número de esquinas
+			esquinas = new ArrayList<Point>();
+			Map<Point, EstadoCasilla> tableroMap = tablero.obtenerTablero();
+			for (int x = 0; x < Tablero.TABLERO_LARGO; x++) {
+				for (int y = 0; y < Tablero.TABLERO_ANCHO; y++) {
+					if(tableroMap.get(new Point(x,y)) != EstadoCasilla.WALL){
+						if(esEsquina(new Point(x,y),tablero)){
+							esquinas.add(new Point(x,y));
+						}
+					}
+				}
+			}
 		}
 		return esquinas;
 	}
 	
+	private boolean esEsquina(Point semilla, Tablero tablero) {
+		boolean esquina=false;
+		int x = semilla.x;
+		int y = semilla.y;
+		if( !puntoEsValido(new Point(x-1,y), tablero ) && !puntoEsValido(new Point(x,y-1), tablero ) && !puntoEsValido(new Point(x-1,y-1), tablero )){
+			esquina = true;
+		}
+		if( !puntoEsValido(new Point(x-1,y), tablero ) && !puntoEsValido(new Point(x-1,y+1), tablero ) && !puntoEsValido(new Point(x,y+1), tablero )){
+			esquina = true;
+		}
+		if( !puntoEsValido(new Point(x,y+1), tablero ) && !puntoEsValido(new Point(x+1,y+1), tablero ) && !puntoEsValido(new Point(x+1,y), tablero )){
+			esquina = true;
+		}
+		if( !puntoEsValido(new Point(x,y-1), tablero ) && !puntoEsValido(new Point(x+1,y-1), tablero ) && !puntoEsValido(new Point(x+1,y), tablero )){
+			esquina = true;
+		}
+		return esquina;
+	}
+	
+	private boolean puntoEsValido(Point punto, Tablero tablero) {
+		return punto.x >= 0 && punto.x < Tablero.TABLERO_LARGO 
+				&& punto.y >= 0 && punto.y < Tablero.TABLERO_ANCHO
+				&& tablero.obtenerEstadoCasilla(punto) != EstadoCasilla.WALL;
+	}
+
 	public double getX1(){
 		return x1;
 	}
@@ -189,6 +208,5 @@ public class EvaluacionEstrategica implements Evaluacion{
 	public double getX4(){
 		return x4;
 	}
-
 
 }

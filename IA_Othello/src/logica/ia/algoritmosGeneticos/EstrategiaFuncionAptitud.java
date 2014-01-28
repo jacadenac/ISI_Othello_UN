@@ -9,8 +9,6 @@ import core.Tablero.TipoTablero;
 
 public class EstrategiaFuncionAptitud extends FitnessFunction{
 	private static final long serialVersionUID = 1L;
-	// Valor que debe resultar de la suma de todos los genes
-	//private static final int SUMA_PESO_TOTAL = 1000;
 	private static IChromosome[] estrategiasCompetidoras;
 	
 	public EstrategiaFuncionAptitud(IChromosome[] poblacion) {
@@ -36,12 +34,6 @@ public class EstrategiaFuncionAptitud extends FitnessFunction{
 	protected double evaluate(IChromosome cromosoma) {
 		double fitness=0;
 		int[] estrategia1 = obtenerValoresCromosoma(cromosoma);
-		//Verifica que el peso total sume 1000
-		/*
-		if( (estrategia[0]+estrategia[1]+estrategia[2]+estrategia[3]) != SUMA_PESO_TOTAL){
-			System.out.println(estrategia[0]+estrategia[1]+estrategia[2]+estrategia[3]);
-			throw new IllegalArgumentException("La suma debe ser de 1000");
-		}*/
 		
 		if (estrategiasCompetidoras == null) {
 			System.out.println("No hay competidores!");
@@ -55,11 +47,7 @@ public class EstrategiaFuncionAptitud extends FitnessFunction{
 			}
 			
 			Torneo torneo = new Torneo(estrategia1, competidores, TipoTablero.OCTOGONAL,10);
-			
-			/**///System.out.println("\n"+"/*-----------TORNEO "+Torneo.numeroTablerosCreados+"----------*"+"\n");
-			/**///System.out.print("Estrategia 1 obtuvo " + torneo.getCantidadVictorias() 
-				//	+" de un total de " + competidores.length +" partidas.\n\n");
-			
+						
 			fitness = (torneo.getCantidadVictorias());
 			if(torneo.getCantidadVictorias() == competidores.length){
 				fitness += 10;

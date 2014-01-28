@@ -69,54 +69,12 @@ public class Estrategia {
 		
 
 		// Se define el operador genético: cómo será la reproducción
-		// -------------------------------------------------------------------
-		//List m_geneticOperators;
-		//m_geneticOperators = new Vector();
-		 
-		
+		// -------------------------------------------------------------------	
 		@SuppressWarnings("serial")
 		GeneticOperator operadorGeneticoMutacion = new GeneticOperator() {
-			@SuppressWarnings({ "unchecked" })
-			@Override
-			public void operate(Population actual, @SuppressWarnings("rawtypes") List nueva) {
-				List<IChromosome> cromosomas = actual.getChromosomes();
-				List<IChromosome> temporal = new ArrayList<IChromosome>();
-				
-				for(IChromosome cromosoma: cromosomas){
-					Gene[] genes = new Gene[4];
-					for(int j=0 ; j<genes.length ; j++){
-						try {
-							genes[j] = new IntegerGene(conf, 0, RANGO_GEN);
-						} catch (InvalidConfigurationException e) {
-							System.out.println("Error al crear los Genes en GeneticOperator");
-						}
-						
-						int valorAleatorio = (int) Math.floor(Math.random()*(10-80+1)+80);  // Valor entre 80 y 10, ambos incluidos.
-						int signo = (int)Math.signum((Math.random()*2)-1);
-						
-						int AleloActual = (Integer)cromosoma.getGenes()[j].getAllele();
-						int AleloNuevo;
-						if (AleloActual  + (signo*valorAleatorio) < 0 || AleloActual  + (signo*valorAleatorio) > RANGO_GEN) { 
-							AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
-						} else {
-							AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
-						}
-						genes[j].setAllele(AleloNuevo);
-					}		
-					try {
-						IChromosome cromosomaNuevo = new Chromosome(conf, genes);
-						temporal.add(cromosomaNuevo);
-						//System.out.println("size="+temporal.size());
-					} catch (InvalidConfigurationException e) {
-						System.out.println("Error al añadir a Cromosoma temporal en GeneticOperator");
-					}
-				}
-				int cantPoblacionAMutar = (int)(conf.getPopulationSize()*0.4);
-				for(int i=0; i < cantPoblacionAMutar; i++){
-					if(temporal !=null){
-						nueva.add(temporal.get(i));
-					}
-				}
+			@Override @SuppressWarnings("rawtypes")
+			public void operate(Population actual, List nueva) {
+				nueva = mutarYCruzar(actual, nueva);
 			}
 		};
 		//Añade el Operador Genético de mutación creado anteriormente
@@ -169,9 +127,9 @@ public class Estrategia {
 			int[] mejor1 = obtenerValoresCromosoma((IChromosome) mejores2.get(0));
 			int[] mejor2 = obtenerValoresCromosoma((IChromosome) mejores2.get(1));
 			
-			String dosMejoresCromosomas = "";
+			String dosMejoresCromosomas = "\r\n";
 			dosMejoresCromosomas +=  mejor1[0]+","+mejor1[1]+","+mejor1[2]+","+mejor1[3]+"\r\n"+
-									 mejor2[0]+","+mejor2[1]+","+mejor2[2]+","+mejor2[3]+"\r\n";
+									 mejor2[0]+","+mejor2[1]+","+mejor2[2]+","+mejor2[3];
 			guardarDatosEvolucion(dosMejoresCromosomas,"dosMejores.txt");
 			
 			//Evoluciona la población
@@ -253,7 +211,7 @@ public class Estrategia {
 	}
 	
 	private static int[][] leerPoblacion() {
-		    int[][] poblacion = new int[12][5];
+		    int[][] poblacion = new int[16][5];  //tamaño población inicial -> 15
 			JFileChooser fileChooser = new JFileChooser();
 			String nombreFichero = "poblacionInicial.txt";
 			File fichero = new File(directorio.getPath(),nombreFichero);
@@ -310,7 +268,12 @@ public class Estrategia {
             directorio.mkdirs();
         }
 		try {
-			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, false);
+			boolean bandera = false;
+			if(nombreFichero == "dosMejores.txt"){
+				bandera = true;
+			}
+			
+			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, bandera);
 			PrintWriter writer;
 			writer = new PrintWriter(fichero);
 			writer.println(datos);
@@ -318,6 +281,116 @@ public class Estrategia {
 		} catch (IOException e) {
 			System.out.println("No se ha podido escribir en el archivo torneo.txt");
 		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static List mutarYCruzar(Population actual, List nueva){
+			List<IChromosome> cromosomasActuales = actual.getChromosomes();
+			List<IChromosome> temporal = new ArrayList<IChromosome>();
+			List<IChromosome> cromosomasSinRepetidos = new ArrayList<IChromosome>();
+			
+			//obtenemos el mejor de la población actual y lo almacenamos temporalmente:
+			IChromosome cromosomaMasApto = actual.determineFittestChromosome();
+			int AleloActual;
+			int AleloNuevo=0;
+			int valorAleatorio;  
+			int signo = (int)Math.signum((Math.random()*2)-1);
+			
+			int i=0;
+			for(IChromosome cromosoma: cromosomasActuales){
+				Gene[] genes = new Gene[4];
+				for(int j=0 ; j<genes.length ; j++){
+					try {
+						genes[j] = new IntegerGene(conf, 0, RANGO_GEN);
+					} catch (InvalidConfigurationException e) {
+						System.out.println("Error al crear los Genes en GeneticOperator");
+					}
+					AleloActual = (Integer)cromosoma.getGenes()[j].getAllele();
+					//si encuentra individuos repetidos, realiza mutaciones
+					if( (i+1) < cromosomasActuales.size()){
+						for(int k = i+1; k < cromosomasActuales.size();k++){
+							if(cromosoma.equals(cromosomasActuales.get(k))){
+								/**/System.out.println("Entró mutar repetidos!");
+								valorAleatorio = (int) Math.floor(Math.random()*(0-90+1)+90); // Valor entre 10 y 100, ambos incluidos.
+								if (AleloActual  + (signo*valorAleatorio) < 0 || AleloActual  + (signo*valorAleatorio) > RANGO_GEN) { 
+									AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
+								} else {
+									AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
+								}
+							}
+						}
+					}
+					genes[j].setAllele(AleloNuevo);
+				}
+				try {
+					IChromosome cromosomaNuevo = new Chromosome(conf, genes);
+					cromosomasSinRepetidos.add(cromosomaNuevo);
+					//System.out.println("size="+temporal.size());
+				} catch (InvalidConfigurationException e) {
+					System.out.println("Error al añadir a Cromosoma temporal en GeneticOperator");
+				}
+				i++;
+			}
+			
+			i=0;
+			for(IChromosome cromosoma: cromosomasSinRepetidos){
+				Gene[] genes = new Gene[4];
+				for(int j=0 ; j<genes.length ; j++){
+					try {
+						genes[j] = new IntegerGene(conf, 0, RANGO_GEN);
+					} catch (InvalidConfigurationException e) {
+						System.out.println("Error al crear los Genes en GeneticOperator");
+					}
+					AleloActual = (Integer)cromosoma.getGenes()[j].getAllele();
+	
+					//Si el cromosoma más apto se encuentra repetido, realiza mutaciones pequeñas sobre ellos
+					//Si no, realizará mutaciones grandes a unos y cruzes con otros
+					if(cromosoma.equals(cromosomaMasApto)){
+						/**///System.out.println("Entró a mutar en primer grado!");
+						valorAleatorio = (int) Math.floor(Math.random()*(10-130+1)+130); // Valor entre 0 y 80, ambos incluidos.
+						if (AleloActual  + (signo*valorAleatorio) < 0 || AleloActual  + (signo*valorAleatorio) > RANGO_GEN) { 
+							AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
+						} else {
+							AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
+						}
+					} else if( i%2 == 0 ){
+						/**///System.out.println("Entró a mutar en segundo grado!");
+						valorAleatorio = (int) Math.floor(Math.random()*(100-600+1)+600); //Valor entre 100 y 600, ambos incluidos.
+						if (AleloActual  + (signo*valorAleatorio) < 0 || AleloActual  + (signo*valorAleatorio) > RANGO_GEN) { 
+							AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
+						} else {
+							AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
+						}
+					} else {
+						if( j%2 == 0 && (i+1) < cromosomasActuales.size() && j<cromosomasActuales.get(i+1).getGenes().length){
+							/**///System.out.println("Entró a cruzar!");
+							int AleloSiguiente = (Integer)cromosomasActuales.get(i+1).getGenes()[j+1].getAllele();
+							AleloNuevo = AleloSiguiente;
+						} else {
+							AleloNuevo = AleloActual;
+						}
+					}
+					genes[j].setAllele(AleloNuevo);
+				}		
+				try {
+					IChromosome cromosomaNuevo = new Chromosome(conf, genes);
+					temporal.add(cromosomaNuevo);
+					//System.out.println("size="+temporal.size());
+				} catch (InvalidConfigurationException e) {
+					System.out.println("Error al añadir a Cromosoma temporal en GeneticOperator");
+				}
+				i++;
+			}
+			int cantPoblacionAMutar = (int)(conf.getPopulationSize()/**0.9*/);
+			nueva.add(cromosomaMasApto);
+			for(int j=1; j < cantPoblacionAMutar; j++){
+				valorAleatorio = (int) Math.random()*temporal.size();
+				if(temporal !=null){
+					nueva.add(temporal.get(valorAleatorio));
+					temporal.remove(valorAleatorio);
+				}
+			}
+			return nueva;
 	}
 	
 }
