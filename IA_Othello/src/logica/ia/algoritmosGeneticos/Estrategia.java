@@ -261,7 +261,7 @@ public class Estrategia {
 			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, false);
 			PrintWriter writer;
 			writer = new PrintWriter(fichero);
-			for (int i = 0; i < 17; i++) {
+			for (int i = 0; i < 16; i++) {
 				int[] cromosoma = obtenerValoresCromosoma(cromosomas[i]);
 				poblacion += numeroCromosomasCreados+"-"+cromosoma[0]+","+cromosoma[1]+","+cromosoma[2]+","+cromosoma[3];
 				if(i != cromosomas.length-1){
