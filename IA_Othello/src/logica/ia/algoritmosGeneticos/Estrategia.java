@@ -108,7 +108,7 @@ public class Estrategia {
 		// configuración
 		// -------------------------------------------------------------------
 		conf.setPopulationSize(cantidadCompetidores());
-		/**/conf.setPopulationSize(16);
+		/**///conf.setPopulationSize(16);
 		
 		// El framework permite obtener la población inicial de archivos xml
 		// pero para este caso se crea una poblacion aleatoria, para ello se utiliza
@@ -265,7 +265,7 @@ public class Estrategia {
 				int[] cromosoma = obtenerValoresCromosoma(cromosomas[i]);
 				poblacion += numeroCromosomasCreados+"-"+cromosoma[0]+","+cromosoma[1]+","+cromosoma[2]+","+cromosoma[3];
 				if(i != cromosomas.length-1){
-					poblacion += "\r\n";
+					//poblacion += "\r\n";
 				}
 				numeroCromosomasCreados++;
 			}
