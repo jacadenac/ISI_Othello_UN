@@ -106,9 +106,11 @@ public class JuegoTorneo extends Thread{
 	}
 	
 	public void definirTipoTablero(int tamanio, TipoTablero tipoTablero){	
+		String nombreFichero = "Octogonal10x10.oth";
+		File directorio = new File("setup/boards");
 		if ( tipoTablero == TipoTablero.OCTOGONAL ) {
 			JFileChooser fileChooser = new JFileChooser();
-			String nombreFichero = "Octogonal10x10.oth";
+			nombreFichero = "Octogonal10x10.oth";
 			if (tamanio == 12) {
 				nombreFichero = "Octogonal12x12.oth";
 			} else if (tamanio == 14) {
@@ -116,7 +118,6 @@ public class JuegoTorneo extends Thread{
 			} else if (tamanio == 16) {
 				nombreFichero = "Octogonal16x16.oth";
 			}
-			File directorio = new File("setup/boards");
 			File fichero = new File(directorio.getPath(),nombreFichero);
 			fileChooser.setCurrentDirectory(fichero);		
 			fileChooser.setFileFilter(miFiltro);
@@ -132,7 +133,14 @@ public class JuegoTorneo extends Thread{
 		}
 		
 		if ( tipoTablero == TipoTablero.PERSONALIZADO ){
-			controlador.inicializar(tamanio, tamanio, tipoTablero);
+			//controlador.inicializar(tamanio, tamanio, tipoTablero);
+			nombreFichero = "Personalizado.oth";
+			File fichero = new File(directorio.getPath(),nombreFichero);
+			try {
+				leerArchivo(fichero, TipoTablero.OCTOGONAL);
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
 		}
 		//run();
 	}

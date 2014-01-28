@@ -1,0 +1,224 @@
+------------------TORNEO 1634----------------- 
+
+Total partidas jugadas: 17
+
+*Juego número 1:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 2:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 3:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 4:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 50, 2, 23 ]
+     Ganó estrategia 2
+*Juego número 5:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 6:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 7:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 8:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 9:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 10:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 11:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 12:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 13:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 665, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 14:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 15:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 16:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 17:
+     Estrategia 1 = [ 633, 622, 31, 709 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+
+     Estrategia 1 obtuvo 16 victorias de 17.
+
+
+
+------------------TORNEO 1635----------------- 
+
+Total partidas jugadas: 17
+
+*Juego número 1:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 2:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 3:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 4:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 50, 2, 23 ]
+     Ganó estrategia 2
+*Juego número 5:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 6:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 7:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 8:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 9:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 10:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 11:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 12:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 13:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 665, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 14:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 15:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 16:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+*Juego número 17:
+     Estrategia 1 = [ 108, 361, 269, 72 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 2
+
+     Estrategia 1 obtuvo 0 victorias de 17.
+
+
+
+------------------TORNEO 1636----------------- 
+
+Total partidas jugadas: 16
+
+*Juego número 1:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 975, 50, 2, 23 ]
+     Ganó estrategia 1
+*Juego número 2:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 61, 420, 522, 927 ]
+     Ganó estrategia 2
+*Juego número 3:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 4:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 50, 2, 23 ]
+     Ganó estrategia 1
+*Juego número 5:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 6:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 7:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 8:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 9:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 10:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 11:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 12:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 13:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 14:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 329, 633, 849, 31 ]
+     Ganó estrategia 1
+*Juego número 15:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 975, 50, 2, 23 ]
+     Ganó estrategia 1
+*Juego número 16:
+     Estrategia 1 = [ 975, 50, 2, 23 ]
+     Estrategia 2 = [ 61, 420, 522, 927 ]
+     Ganó estrategia 2
+
+     Estrategia 1 obtuvo 14 victorias de 16.

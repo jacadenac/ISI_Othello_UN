@@ -261,22 +261,9 @@ public final class Controlador {
 		}
 		return estrategias;
 	}
-	
-	
-	
-	
-	
-	
-	
+		
 	/************************************************************************************************************************/
-	
-	
-	
-	
-	
-	
-	
-	
+		
 	private double porcentajeEsquinas(Tablero tablero, TipoTablero tipoTablero, EstadoCasilla colorJugador) {
 		
 		/*esquinasNegro=0;

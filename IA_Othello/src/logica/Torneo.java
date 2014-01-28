@@ -1,29 +1,35 @@
 package logica;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import javax.swing.JFileChooser;
 
 import core.Tablero.TipoTablero;
 
 public class Torneo {
 
 	private int cantidadVictorias;
-	public static int numeroTablerosCreados=0;
+	public static int numeroTorneosCreados;
 	public String datosTorneo;
 	private static final File directorio = new File("setup/tournament");
 	
-	public Torneo(int[] estrategia, int[][] estrategiasCompetidoras, TipoTablero tipoTablero, int tamTablero) {
+	public Torneo(int[] estrategia, int[][] estrategiasCompetidoras, int tamTablero) {
 		super();
+		leerParametros();
 		datosTorneo="";
-		numeroTablerosCreados++;
+		numeroTorneosCreados++;
 		cantidadVictorias=0;
-		iniciarTorneo(estrategia, estrategiasCompetidoras, tipoTablero, tamTablero);
+		iniciarTorneo(estrategia, estrategiasCompetidoras, tamTablero);
 	}
 
-	private void iniciarTorneo(int[] estrategia1, int[][] estrategiasCompetidoras, TipoTablero tipoTablero, int tamTablero) {
-		datosTorneo += "\r\n------------------TORNEO "+numeroTablerosCreados+"----------------- \r\n";
+	private void iniciarTorneo(int[] estrategia1, int[][] estrategiasCompetidoras, int tamTablero) {
+		datosTorneo += "\r\n------------------TORNEO "+numeroTorneosCreados+"----------------- \r\n";
 		datosTorneo += "\r\nTotal partidas jugadas: "+estrategiasCompetidoras.length+"\r\n\r\n";
 		JuegoTorneo juego;
 		for ( int i=0 ; i<estrategiasCompetidoras.length; i++){
@@ -47,10 +53,12 @@ public class Torneo {
 			}
 			
 			//alterna el color del jugador con estrategia1 de acuerdo al número del torneo
-			if (numeroTablerosCreados%2 == 0) {
-				juego = new JuegoTorneo(estrategia1, estrategia2, tipoTablero, tamTablero);
-			} else {
-				juego = new JuegoTorneo(estrategia2, estrategia1, tipoTablero, tamTablero);
+			if (numeroTorneosCreados%2 == 0 && numeroTorneosCreados%3 != 0) {
+				juego = new JuegoTorneo(estrategia1, estrategia2, TipoTablero.OCTOGONAL, tamTablero);
+			} else if (numeroTorneosCreados%3 == 0) {
+				juego = new JuegoTorneo(estrategia1, estrategia2, TipoTablero.PERSONALIZADO, tamTablero);
+			}  else {
+				juego = new JuegoTorneo(estrategia2, estrategia1, TipoTablero.CLASICO, tamTablero);
 			}
 			juego.start();
 			if(estrategia1 == juego.getGanador()){
@@ -67,20 +75,27 @@ public class Torneo {
 		}
 		datosTorneo += "\r\n     Estrategia 1 obtuvo " + getCantidadVictorias() + " victorias de " 
 					   + estrategiasCompetidoras.length + ".\r\n\r\n";
-		guardarDatosTorneo(datosTorneo);
+		guardarDatosTorneo(datosTorneo,"Torneos.txt");
+		datosTorneo = ""+numeroTorneosCreados;
+		guardarDatosTorneo(datosTorneo,"parametrosIniciales.txt");
+		
 	}
 	
 	public int getCantidadVictorias() {
 		return cantidadVictorias;
 	}
 	
-	public void guardarDatosTorneo(String datos){
-		String nombreFichero = "Torneos.txt";
+	public void guardarDatosTorneo(String datos, String nombreArchivo){
+		String nombreFichero = nombreArchivo;
 		if (!directorio.exists()) {
             directorio.mkdirs();
         }
 		try {
-			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, true);
+			boolean bandera = true;
+			if(nombreFichero == "parametrosIniciales.txt"){
+				bandera = false;
+			}
+			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, bandera);
 			PrintWriter writer;
 			writer = new PrintWriter(fichero);
 			writer.println(datos);
@@ -92,6 +107,25 @@ public class Torneo {
 	
 	public String getDatosTorneo(){
 		return datosTorneo;
+	}
+	
+	private static void leerParametros() {
+		JFileChooser fileChooser = new JFileChooser();
+		String nombreFichero = "parametrosIniciales.txt";
+		File fichero = new File(directorio.getPath(),nombreFichero);
+		fileChooser.setCurrentDirectory(fichero);		
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(fichero));
+			String linea = reader.readLine();
+			while ((linea = reader.readLine())  != null){
+				numeroTorneosCreados=Integer.parseInt(linea);
+			}		
+			reader.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

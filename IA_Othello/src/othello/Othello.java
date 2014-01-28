@@ -10,9 +10,10 @@ package othello;
 public class Othello {
 	
 	public static void main(String[] args) {
-		Entrenamiento entrenamientoOthello = new Entrenamiento();
 		Juego othello = new Juego();
 		othello.start();
+		
+		Entrenamiento entrenamientoOthello = new Entrenamiento();
 		entrenamientoOthello.start();
 	}
 	

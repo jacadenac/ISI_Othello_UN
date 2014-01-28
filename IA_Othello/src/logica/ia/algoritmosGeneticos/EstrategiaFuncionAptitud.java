@@ -46,11 +46,14 @@ public class EstrategiaFuncionAptitud extends FitnessFunction{
 				}
 			}
 			
-			Torneo torneo = new Torneo(estrategia1, competidores, TipoTablero.OCTOGONAL,10);
+			Torneo torneo = new Torneo(estrategia1, competidores, 10);
 						
 			fitness = (torneo.getCantidadVictorias());
 			if(torneo.getCantidadVictorias() == competidores.length){
 				fitness += 10;
+			}
+			if(fitness == 0){
+				fitness = 1;
 			}
 		}
 		

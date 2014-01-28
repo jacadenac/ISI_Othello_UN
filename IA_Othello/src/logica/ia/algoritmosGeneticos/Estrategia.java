@@ -44,7 +44,7 @@ public class Estrategia {
 	public static int numeroEvolucion=0;
 	public static String cadena="";
 	private static String datosGeneraciones="";
-	public static int numeroCromosomasCreados=1;
+	public static int numeroCromosomasCreados=0;
 	public static Configuration conf = new DefaultConfiguration();
 
 	/**
@@ -55,6 +55,8 @@ public class Estrategia {
 	
 	@SuppressWarnings("deprecation")
 	public static void calcularMejorEstrategia() throws InvalidConfigurationException{
+		leerParametros();
+		
 		// se crea una configuracion con valores predeterminados
 		// -------------------------------------------------------------------
 			/*Configuration conf = new DefaultConfiguration();*/
@@ -82,17 +84,22 @@ public class Estrategia {
 		//conf.setNaturalSelector(null);
 		/*operadorGenetico.operate(poblacionActual, cromosomasSeleccionados);*/
 		
-		// Ahora se indica cómo serán los cromosomas: en este caso tendrán 8
+		// Ahora se indica cómo serán los cromosomas: en este caso tendrán 4
 		// genes (uno para cada coeficiente de la EvaluaciónEstrategica)
 		// con un valor entero que representa el peso de la variable que 
 		// acompañará.
 		// Se debe crear un cromosoma de ejemplo y cargarlo en la configuración.
 		// Cada gen tendrá un valor máximo y mínimo que debe setearse.
 		// -------------------------------------------------------------------
+		int pesoGenAnterior=(int)Math.random()*RANGO_GEN;
+		
 		Gene[] sampleGenes = new Gene[4];
-		sampleGenes[0] = new IntegerGene(conf, 0, RANGO_GEN); // Importancia puntos
-		sampleGenes[1] = new IntegerGene(conf, 0, RANGO_GEN); // Importancia esquinas
+		sampleGenes[0] = new IntegerGene(conf, 0, pesoGenAnterior); // Importancia puntos
+		pesoGenAnterior=(int)Math.random()*(RANGO_GEN-pesoGenAnterior);
+		sampleGenes[1] = new IntegerGene(conf, 0, pesoGenAnterior); // Importancia esquinas
+		pesoGenAnterior=(int)Math.random()*(RANGO_GEN-pesoGenAnterior);
 		sampleGenes[2] = new IntegerGene(conf, 0, RANGO_GEN); // Importancia libertades rival
+		pesoGenAnterior=(int)Math.random()*(pesoGenAnterior);
 		sampleGenes[3] = new IntegerGene(conf, 0, RANGO_GEN); // Importancia casillas centrales
 		
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
@@ -101,21 +108,22 @@ public class Estrategia {
 		// configuración
 		// -------------------------------------------------------------------
 		conf.setPopulationSize(cantidadCompetidores());
-		//conf.setPopulationSize(200);
+		/**/conf.setPopulationSize(16);
 		
 		// El framework permite obtener la población inicial de archivos xml
 		// pero para este caso se crea una poblacion aleatoria, para ello se utiliza
 		// el metodo randomInitialGenotype que devuelve la población random creada.
-		Genotype poblacion = obtenerPoblacion(conf);
+		/**/Genotype poblacion = obtenerPoblacion(conf);
+		//Genotype poblacion = Genotype.randomInitialGenotype(conf);		
 		EstrategiaFuncionAptitud.setEstrategiasCompetidoras(poblacion.getChromosomes());
-		//poblacion = Genotype.randomInitialGenotype(conf);		
+		
 		
 		// La población debe evolucionar para obtener resultados más aptos
 		// -------------------------------------------------------------------
 		long tiempoComienzo = System.currentTimeMillis();
 		
 		for (int i = 0; i < MAX_EVOLUCIONES_PERMITIDAS; i++){
-			datosGeneraciones += "\r\n------------------ GENERACIÓN "+numeroEvolucion+" ----------------- \r\n";
+			datosGeneraciones = "\r\n------------------ GENERACIÓN "+numeroEvolucion+" ----------------- \r\n";
 			System.out.println("\n------------------GENERACIÓN "+numeroEvolucion+"----------------- \n");
 			IChromosome[] cromosomas = poblacion.getPopulation().toChromosomes();
 			datosGeneraciones += "\r\n"+poblacionToString(cromosomas)+"\r\n";
@@ -141,6 +149,9 @@ public class Estrategia {
 			datosGeneraciones += "Mejores:\r\n"+ dosMejoresCromosomas+"\r\n\r\n";
 			guardarDatosEvolucion(datosGeneraciones,"evolucionGeneraciones.txt");
 			numeroEvolucion++;
+			
+			datosGeneraciones = numeroEvolucion+","+numeroCromosomasCreados;
+			guardarDatosEvolucion(datosGeneraciones,"parametrosIniciales.txt");
 		}
 		long tiempoFin = System.currentTimeMillis();
 		cadena += "Tiempo total de evolución: "+ (tiempoFin - tiempoComienzo) + " ms";
@@ -186,7 +197,7 @@ public class Estrategia {
 				genes[j].setAllele((Integer)(estrategiasCompetidoras[i][j]));
 			}		
 			chromosomas[i] = new Chromosome(conf, genes);	
-			//int[] cromosoma = obtenerValoresCromosoma(chromosomas[i]);
+			/**/int[] cromosoma = obtenerValoresCromosoma(chromosomas[i]);
 			/**///System.out.println(cromosoma[0]+","+cromosoma[1]+","+cromosoma[2]+","+cromosoma[3]);
 		}
 		Population population = new Population(conf,chromosomas);
@@ -211,9 +222,10 @@ public class Estrategia {
 	}
 	
 	private static int[][] leerPoblacion() {
-		    int[][] poblacion = new int[16][5];  //tamaño población inicial -> 15
+		    int[][] poblacion = new int[17][5];  //tamaño población inicial -> 15
 			JFileChooser fileChooser = new JFileChooser();
-			String nombreFichero = "poblacionInicial.txt";
+			//String nombreFichero = "poblacionInicial.txt";
+			String nombreFichero = "ultimaGeneracion.txt";
 			File fichero = new File(directorio.getPath(),nombreFichero);
 			fileChooser.setCurrentDirectory(fichero);		
 			try {
@@ -249,9 +261,12 @@ public class Estrategia {
 			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, false);
 			PrintWriter writer;
 			writer = new PrintWriter(fichero);
-			for (int i = 0; i < cromosomas.length; i++) {
+			for (int i = 0; i < 17; i++) {
 				int[] cromosoma = obtenerValoresCromosoma(cromosomas[i]);
-				poblacion += numeroCromosomasCreados+"-"+cromosoma[0]+","+cromosoma[1]+","+cromosoma[2]+","+cromosoma[3]+"\r\n";
+				poblacion += numeroCromosomasCreados+"-"+cromosoma[0]+","+cromosoma[1]+","+cromosoma[2]+","+cromosoma[3];
+				if(i != cromosomas.length-1){
+					poblacion += "\r\n";
+				}
 				numeroCromosomasCreados++;
 			}
 			writer.println(poblacion);
@@ -262,15 +277,16 @@ public class Estrategia {
 		return poblacion;
 	}
 	
-	public static void guardarDatosEvolucion(String datos,String nombreArchivo){
+	public static void guardarDatosEvolucion(String datos, String nombreArchivo){
 		String nombreFichero = nombreArchivo;
 		if (!directorio.exists()) {
             directorio.mkdirs();
         }
 		try {
-			boolean bandera = false;
-			if(nombreFichero == "dosMejores.txt"){
-				bandera = true;
+			
+			boolean bandera = true;
+			if(nombreFichero == "parametrosIniciales.txt"){
+				bandera = false;
 			}
 			
 			FileWriter fichero = new FileWriter(directorio.getPath()+"/"+nombreFichero, bandera);
@@ -299,9 +315,11 @@ public class Estrategia {
 			int i=0;
 			for(IChromosome cromosoma: cromosomasActuales){
 				Gene[] genes = new Gene[4];
+				int pesoGenAnterior=(int)Math.random()*RANGO_GEN;
 				for(int j=0 ; j<genes.length ; j++){
 					try {
-						genes[j] = new IntegerGene(conf, 0, RANGO_GEN);
+						genes[j] = new IntegerGene(conf, 0, pesoGenAnterior);
+						pesoGenAnterior=(int)Math.random()*(RANGO_GEN-pesoGenAnterior);
 					} catch (InvalidConfigurationException e) {
 						System.out.println("Error al crear los Genes en GeneticOperator");
 					}
@@ -310,7 +328,7 @@ public class Estrategia {
 					if( (i+1) < cromosomasActuales.size()){
 						for(int k = i+1; k < cromosomasActuales.size();k++){
 							if(cromosoma.equals(cromosomasActuales.get(k))){
-								/**/System.out.println("Entró mutar repetidos!");
+								/**///System.out.println("Entró mutar repetidos!");
 								valorAleatorio = (int) Math.floor(Math.random()*(0-90+1)+90); // Valor entre 10 y 100, ambos incluidos.
 								if (AleloActual  + (signo*valorAleatorio) < 0 || AleloActual  + (signo*valorAleatorio) > RANGO_GEN) { 
 									AleloNuevo = AleloActual +(-1)*(signo*valorAleatorio);
@@ -335,9 +353,11 @@ public class Estrategia {
 			i=0;
 			for(IChromosome cromosoma: cromosomasSinRepetidos){
 				Gene[] genes = new Gene[4];
+				int pesoGenAnterior=(int)Math.random()*RANGO_GEN;
 				for(int j=0 ; j<genes.length ; j++){
 					try {
-						genes[j] = new IntegerGene(conf, 0, RANGO_GEN);
+						genes[j] = new IntegerGene(conf, 0, RANGO_GEN-pesoGenAnterior);
+						pesoGenAnterior=(int)Math.random()*(RANGO_GEN-pesoGenAnterior);
 					} catch (InvalidConfigurationException e) {
 						System.out.println("Error al crear los Genes en GeneticOperator");
 					}
@@ -392,5 +412,24 @@ public class Estrategia {
 			}
 			return nueva;
 	}
-	
+
+	private static void leerParametros() {
+		JFileChooser fileChooser = new JFileChooser();
+		String nombreFichero = "parametrosIniciales.txt";
+		File fichero = new File(directorio.getPath(),nombreFichero);
+		fileChooser.setCurrentDirectory(fichero);		
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(fichero));
+			String linea = reader.readLine();
+			String[] dimensiones = linea.split(",");
+			numeroEvolucion=Integer.parseInt(dimensiones[0]);
+			numeroCromosomasCreados=Integer.parseInt(dimensiones[1]);
+			reader.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

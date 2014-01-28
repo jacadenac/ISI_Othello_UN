@@ -59,7 +59,7 @@ public class EvaluacionEstrategica implements Evaluacion{
 		
 		totalEsquinas = 4;
 		if (tipoTablero  == TipoTablero.OCTOGONAL) {
-			totalEsquinas = 8;
+			totalEsquinas = ubicacionEsquinas.size();
 		} else if (tipoTablero  == TipoTablero.PERSONALIZADO){
 			totalEsquinas = ubicacionEsquinas.size();
 		}
@@ -146,7 +146,7 @@ public class EvaluacionEstrategica implements Evaluacion{
 			esquinas.add(new Point(1, Tablero.TABLERO_ANCHO-2));
 			esquinas.add(new Point(Tablero.TABLERO_LARGO-2, Tablero.TABLERO_ANCHO-2));
 		} if (tipoTablero == TipoTablero.OCTOGONAL) {
-			esquinas = new ArrayList<Point>(8);
+			/*esquinas = new ArrayList<Point>(8);
 			esquinas.add(new Point( 0, (int)(Tablero.TABLERO_LARGO/2)-1) );
 			esquinas.add(new Point( 0, (int)(Tablero.TABLERO_LARGO/2))   );
 			esquinas.add(new Point( (int)((Tablero.TABLERO_ANCHO/2)-1), 0) );
@@ -154,7 +154,18 @@ public class EvaluacionEstrategica implements Evaluacion{
 			esquinas.add(new Point( (int)((Tablero.TABLERO_ANCHO/2)-1), Tablero.TABLERO_LARGO-1) );
 			esquinas.add(new Point( (int)((Tablero.TABLERO_ANCHO/2)), Tablero.TABLERO_LARGO-1) );
 			esquinas.add(new Point( Tablero.TABLERO_LARGO-1, (int)(Tablero.TABLERO_LARGO/2)-1) );
-			esquinas.add(new Point( Tablero.TABLERO_LARGO-1, (int)(Tablero.TABLERO_LARGO/2))   );
+			esquinas.add(new Point( Tablero.TABLERO_LARGO-1, (int)(Tablero.TABLERO_LARGO/2))   );*/
+			esquinas = new ArrayList<Point>();
+			Map<Point, EstadoCasilla> tableroMap = tablero.obtenerTablero();
+			for (int x = 0; x < Tablero.TABLERO_LARGO; x++) {
+				for (int y = 0; y < Tablero.TABLERO_ANCHO; y++) {
+					if(tableroMap.get(new Point(x,y)) != EstadoCasilla.WALL){
+						if(esEsquina(new Point(x,y),tablero)){
+							esquinas.add(new Point(x,y));
+						}
+					}
+				}
+			}
 		} if (tipoTablero == TipoTablero.PERSONALIZADO) { //si es personalizado debe detectar número de esquinas
 			esquinas = new ArrayList<Point>();
 			Map<Point, EstadoCasilla> tableroMap = tablero.obtenerTablero();
